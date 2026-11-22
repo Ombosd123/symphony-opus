@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SYMPHONY ($OPUS) — Rhapsody No. 1</title>
+<meta name="description" content="SYMPHONY ($OPUS), Rhapsody No. 1: a fair launch for Binance Agent ID holders on BNB Chain. Open Score: every note on-chain.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">SYMPHONY</a>
+  <nav>
+    <a href="#prelude" data-i18n="nav_prelude">Prelude</a>
+    <a href="#soundcheck" data-i18n="nav_soundcheck">Soundcheck</a>
+    <a href="#presale" data-i18n="nav_presale">Presale</a>
+    <a href="#sale" data-i18n="nav_sale">Sale</a>
+    <a href="#market" data-i18n="nav_market">Market</a>
+    <a href="roadmap.html" data-i18n="nav_roadmap">Roadmap</a>
+    <a href="scherzo.html" data-i18n="nav_scherzo">Scherzo</a>
+    <a href="faq.html" data-i18n="nav_faq">FAQ</a>
+    <a href="#contact" data-i18n="nav_contact">Contact</a>
+  </nav>
+  <div class="spacer"></div>
+  <select id="langSelect" aria-label="Language">
+    <option value="en">English</option>
+    <option value="zh-Hans">简体中文</option>
+    <option value="ja">日本語</option>
+    <option value="id">Bahasa Indonesia</option>
+    <option value="vi">Tiếng Việt</option>
+  </select>
+  <button id="soundToggleBtn" type="button" class="ghost">🔊 Sound on</button>
+  <button id="connectBtn" data-i18n="btn_connect">Connect wallet</button>
+</header>
+<main>
+  <p class="status" id="walletStatus"></p>
+
+  <section id="home">
+    <p class="tagline" data-i18n="hero_edition">Rhapsody No. 1 — the first movement · Season 1</p>
+    <h1>SYMPHONY</h1>
+    <p class="tagline" data-i18n="hero_tagline">Open Score: every note on-chain.</p>
+    <p data-i18n="hero_text">SYMPHONY ($OPUS) is a fair launch built only for Binance Agent ID holders on BNB Chain. Every number — the escrow, the split, the refund path — is written in immutable, verified contracts that anyone can read. No promises of profit; the score is public, and the code plays it exactly as written.</p>
+    <p class="tagline" data-i18n="hero_spirit">No one plays a symphony alone.</p>
+    <p data-i18n="hero_spirit_text">SYMPHONY is a community project. Like an orchestra, it cannot stand on one player — the token is built together, note by note, by the people who show up: registering, checking in daily, and taking part. Built together, note by note.</p>
+    <p class="tagline" data-i18n="hero_roadmap">Season 1: Rhapsody No. 1 — Season 2 (planned): Scherzo.</p>
+    <p class="countdown" id="countdown"></p>
+  </section>
+
+  <section id="stages">
+    <h2 data-i18n="stg_title">How SYMPHONY works — four stages</h2>
+    <p data-i18n="stg_intro">SYMPHONY is a ladder, not a single free mint. Two free stages come first — registering and showing up daily. At its core is a paid sale, and it ends with one verdict day that decides everything. Nothing is hidden: the free stages are free (gas only), and the sale is paid, in plain sight.</p>
+    <div class="stages">
+      <div class="stage">
+        <span class="stage-num">1</span>
+        <h3 data-i18n="stg1_name">Prelude</h3>
+        <p data-i18n="stg1_text">Register your Agent ID and take your seat.</p>
+        <p class="stage-dates" data-i18n="stg1_dates">Now → 12 Dec 2026</p>
+        <span class="chip free" data-i18n="stg_chip_free">FREE — gas only</span>
+      </div>
+      <span class="stage-arrow" aria-hidden="true">→</span>
+      <div class="stage">
+        <span class="stage-num">2</span>
+        <h3 data-i18n="stg2_name">Soundcheck</h3>
+        <p data-i18n="stg2_text">Check in daily, build your streak, earn badges and the OPUS MAGNUM.</p>
+        <p class="stage-dates" data-i18n="stg2_dates">Every day → 30 Dec 2026</p>
+        <span class="chip free" data-i18n="stg_chip_free">FREE — gas only</span>
+      </div>
+      <span class="stage-arrow" aria-hidden="true">→</span>
+      <div class="stage">
+        <span class="stage-num">3</span>
+        <h3 data-i18n="stg3_name">The Sale — Rhapsody No. 1</h3>
+        <p data-i18n="stg3_text">Buy Passes with USDT across three tiers: 1 / 1.5 / 2 USDT per Pass. This is the paid core of SYMPHONY.</p>
+        <p class="stage-dates" data-i18n="stg3_dates">12 – 30 Dec 2026</p>
+        <span class="chip paid" data-i18n="stg_chip_paid">PAID — USDT</span>
+      </div>
+      <span class="stage-arrow" aria-hidden="true">→</span>
+      <div class="stage">
+        <span class="stage-num">4</span>
+        <h3 data-i18n="stg4_name">Verdict &amp; Claims</h3>
+        <p data-i18n="stg4_text">The verdict: if all 5,000 Passes are sold, the pool opens and burning an NFT claims its OPUS; if not, every buyer is refunded 100%.</p>
+        <p class="stage-dates" data-i18n="stg4_dates">30 Dec 2026</p>
+        <span class="chip verdict" data-i18n="stg_chip_verdict">VERDICT DAY</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="openscore">
+    <h2 data-i18n="os_title">Open Score — how the money moves</h2>
+    <p data-i18n="os_text">Sale funds are held in escrow by the sale contract, never by a person. If all 5,000 Passes sell, 90% of the raise seeds the liquidity pool and 10% goes to the TreasuryVault — a holding contract that only the project treasury wallet can claim from. If the sale has not sold out by the verdict on 30 Dec 2026, 12:00 UTC, every buyer is refunded 100% of their USDT. The split is executed by code, not by trust.</p>
+    <table>
+      <tr><th data-i18n="sup_title">OPUS supply — 600,000,000, minted once</th><th>OPUS</th></tr>
+      <tr><td data-i18n="sup_participants">Sale participants</td><td>325,000,000</td></tr>
+      <tr><td data-i18n="sup_pool">Liquidity pool</td><td>175,000,000</td></tr>
+      <tr><td data-i18n="sup_community">Community (Soundcheck 30M + Prelude 15M + Prelude referral 5M)</td><td>50,000,000</td></tr>
+      <tr><td data-i18n="sup_referral">Referral</td><td>25,000,000</td></tr>
+      <tr><td data-i18n="sup_encore">Encore pool</td><td>5,000,000</td></tr>
+      <tr><td data-i18n="sup_team">Team (15M vesting + 5M presale)</td><td>20,000,000</td></tr>
+    </table>
+    <p class="small muted" data-i18n="os_note">OPUS is a plain ERC-20: no transfer tax, no re-minting, no hidden admin keys.</p>
+  </section>
+
+  <section id="prelude">
+    <h2 data-i18n="pre_title">Prelude — register free</h2>
+    <p data-i18n="pre_text">Registration is free (gas only), one per Agent ID, with no obligation to buy anything. You receive a soulbound Prelude Pass. The sale opens on 12 Dec 2026 · 12:00 UTC only if at least 500 holders have registered by that moment; below 500, the sale does not open. Registered holders enter the sale 48 hours before the public, with a share of the 15,000,000 OPUS Prelude bonus pool if they buy at least one Pass and the sale graduates.</p>
+    <p><span data-i18n="pre_count_label">Registrations so far:</span> <strong id="preludeCount">—</strong> / 500</p>
+    <div class="bar"><div id="gateBar"></div></div>
+    <p class="small muted" id="gateNote"></p>
+    <p class="status" id="myPrelude"></p>
+    <button id="registerBtn" data-i18n="pre_btn">Register for Prelude</button>
+    <p class="small muted" data-i18n="pre_close">Registration closes 12 Dec 2026, 12:00 UTC — the moment the sale opens.</p>
+    <p class="small muted" id="refArriveNote"></p>
+    <h3 data-i18n="ref_title">Prelude referral — bring a player</h3>
+    <p data-i18n="ref_text">After you register, share your personal referral link. For every person who registers for Prelude through your link, 100 OPUS is credited to you from the 5,000,000 OPUS Prelude referral pool — at most 50 people are counted per referrer (5,000 OPUS at most). The referrer is recorded on-chain in the PreludeRegistry contract at the moment they register. The credit is paid only if the sale graduates, in the same 30-day claim window as the other community rewards; unclaimed shares are burned. This phase-1 referral is separate from the sale referral (5,000 OPUS per Pass sold, from its own 25,000,000 OPUS allocation).</p>
+    <div id="referralCard" class="refcard" hidden>
+      <p><span data-i18n="ref_link_label">Your personal referral link:</span></p>
+      <input id="refLinkInput" type="text" readonly value="">
+      <p><button id="copyRefBtn" type="button" class="ghost" data-i18n="ref_copy">Copy link</button> <span class="status" id="refCopyStatus"></span></p>
+      <p class="small muted"><span data-i18n="ref_count_label">Registrations recorded through your link:</span> <strong id="refCount">—</strong></p>
+    </div>
+    <div id="melodyCard" class="melodycard" hidden>
+      <h3 data-i18n="mel_title">Your Melody</h3>
+      <p data-i18n="mel_intro">Every wallet address carries its own melody — an 8-note phrase derived from the address itself, following a public recipe anyone can recompute (see the FAQ). It is an identity, not an asset: it grants no claim, bonus or value.</p>
+      <p class="melodyno" id="melodyNo"></p>
+      <p><span data-i18n="mel_notes_label">Notes</span>: <strong class="melodynotes" id="melodyNotes">—</strong></p>
+      <button id="melodyPlayBtn" data-i18n="mel_play">Play my melody</button>
+      <span class="status" id="melodyStatus"></span>
+    </div>
+    <p id="latestMelodyRow" hidden>
+      <button id="latestMelodiesBtn" class="ghost" data-i18n="mel_latest_btn">Play the latest melodies</button>
+      <span class="status" id="latestMelodyStatus"></span>
+    </p>
+  </section>
+
+  <section id="soundcheck">
+    <h2 data-i18n="sc_title">Soundcheck — show up every day</h2>
+    <p data-i18n="sc_text">Check in free, once a day (UTC), with any Agent ID. Keep the streak alive and badges are minted to you automatically. Complete the full 14-day set and you also receive the OPUS MAGNUM — your claim instrument for a pro-rata share of the 30,000,000 OPUS Soundcheck pool (capped at 60,000 OPUS per person), payable if the sale graduates.</p>
+    <div class="badges">
+      <figure><img src="assets/badge-first-note.webp" alt="FIRST NOTE"><figcaption data-i18n="b1_desc">Day 1 — FIRST NOTE</figcaption></figure>
+      <figure><img src="assets/badge-tuning.webp" alt="TUNING"><figcaption data-i18n="b2_desc">Day 3 — TUNING</figcaption></figure>
+      <figure><img src="assets/badge-rehearsal.webp" alt="REHEARSAL"><figcaption data-i18n="b3_desc">Day 7 — REHEARSAL</figcaption></figure>
+      <figure><img src="assets/badge-full-score.webp" alt="FULL SCORE"><figcaption data-i18n="b4_desc">Day 14 — FULL SCORE</figcaption></figure>
+      <figure><img src="assets/opus-magnum.webp" alt="OPUS MAGNUM"><figcaption data-i18n="b5_desc">Full set — OPUS MAGNUM</figcaption></figure>
+    </div>
+    <p class="status" id="mySoundcheck"></p>
+    <button id="checkInBtn" data-i18n="sc_btn_checkin">Check in today</button>
+    <button id="repairBtn" class="ghost" data-i18n="sc_btn_repair">Repair a missed day (0.1 USDT)</button>
+    <p class="small muted" data-i18n="sc_repair_note">Missed exactly one day? A repair costs 0.1 USDT: 0.05 USDT goes to the treasury (this share is not returned, even if the sale fails) and 0.05 USDT is held as a pool share, recorded under your address — it joins the pool if the sale graduates, or you can claim it back during the refund window if the sale fails. A gap of more than one day cannot be repaired; the streak restarts.</p>
+  </section>
+
+  <section id="presale">
+    <h2 data-i18n="ps_title">Presale — direct OPUS</h2>
+    <p data-i18n="ps_text">Alongside the Pass sale there is a small direct presale of 5,000,000 OPUS at $0.0001 per OPUS — openly the most expensive way in, priced as an anchor so the Pass tiers speak for themselves. It opens only once Tier 1 (Overture) is sold out, is capped at 50 USDT per wallet, and its proceeds split 90/10 exactly like the main sale. Nothing is sold before 12 Dec 2026, 12:00 UTC.</p>
+    <table>
+      <tr><th data-i18n="th_tier">Tier</th><th data-i18n="th_price">Price</th><th data-i18n="th_opus">OPUS per Pass</th><th data-i18n="th_openval">Value at opening price</th></tr>
+      <tr><td>1 — Overture (Pass 1–1,500)</td><td>1 USDT</td><td>78,000</td><td>$3.01</td></tr>
+      <tr><td>2 — Crescendo (Pass 1,501–3,500)</td><td>1.5 USDT</td><td>65,000</td><td>$2.51</td></tr>
+      <tr><td>3 — Finale (Pass 3,501–5,000)</td><td>2 USDT</td><td>52,000</td><td>$2.01</td></tr>
+    </table>
+    <p class="small muted" data-i18n="ps_openval_note">Opening price $0.0000386 per OPUS is the price printed by the seeded pool (175,000,000 OPUS + 6,750 USDT). It is a starting print, not a promise: the market price moves from the first trade and can go down as well as up.</p>
+    <p><span data-i18n="ps_your_status">Your Prelude status:</span> <span id="myPreludePresale">—</span></p>
+    <p><span data-i18n="pre_count_label">Registrations so far:</span> <strong id="preludeCountPresale">—</strong> / 500</p>
+    <div class="bar"><div id="gateBarPresale"></div></div>
+  </section>
+
+  <section id="sale">
+    <h2 data-i18n="sale_title">The sale — Rhapsody No. 1 · Season 1</h2>
+    <p data-i18n="sale_text">5,000 Mint Passes, max 10 per wallet, paid in USDT. The sale opens Saturday 12 Dec 2026, 12:00 UTC — the first 48 hours are for Prelude registrants only, then it opens to every Agent ID holder. Minting runs 18 days, until the verdict on Wednesday 30 Dec 2026, 12:00 UTC. If all 5,000 Passes have sold by then, the sale has graduated: the pool is seeded (175,000,000 OPUS + 6,750 USDT on PancakeSwap V2, LP burned) and all burn-to-claim opens. If the Passes sell out early, minting simply stops — the pool and claims still wait for the verdict. If even one Pass remains unsold at the verdict, the sale fails and all buyers are refunded 100%.</p>
+    <div class="tiers">
+      <figure><img src="assets/pass-tier1-overture.webp" alt="Overture Pass"><figcaption>Overture — 1 USDT → 78,000 OPUS</figcaption></figure>
+      <figure><img src="assets/pass-tier2-crescendo.webp" alt="Crescendo Pass"><figcaption>Crescendo — 1.5 USDT → 65,000 OPUS</figcaption></figure>
+      <figure><img src="assets/pass-tier3-finale.webp" alt="Finale Pass"><figcaption>Finale — 2 USDT → 52,000 OPUS</figcaption></figure>
+    </div>
+    <p data-i18n="sale_claims">Claiming OPUS means burning the NFT, one at a time: burn a Pass and choose Premiere (100% at once) or Encore (50% at once, 50% vesting over 60 days, plus an Encore bonus and — on your first Encore claim — a soulbound SCHERZO key NFT: exactly one per wallet, never transferable, the key to a guaranteed Overture seat in Scherzo (the second movement · Season 2, planned) if it opens). ★ Burning is permanent — a burned NFT is destroyed and cannot be recovered.</p>
+  </section>
+
+  <section id="market">
+    <h2><span data-i18n="mk_title">Market</span> <span class="soon" data-i18n="mk_soon">Coming Soon</span></h2>
+    <p data-i18n="mk_text">The official SYMPHONY market is the only way a Pass can change hands. Passes are semi-soulbound — free transfers are not possible, and a Pass cannot be listed on third-party marketplaces. The market opens together with the sale, on 12 Dec 2026, 12:00 UTC, and stays open until the verdict on 30 Dec 2026, 12:00 UTC, when it closes — whether the sale has graduated or failed.</p>
+    <ul>
+      <li data-i18n="mk_r1">Only Passes that have not been claimed can be traded. Payment is in USDT.</li>
+      <li data-i18n="mk_r2">Buyers must hold a Binance Agent ID.</li>
+      <li data-i18n="mk_r3">Sellers set their own price, with a minimum floor of 80% of what that Pass cost: Tier 1 minimum 0.8 USDT, Tier 2 minimum 1.2 USDT, Tier 3 minimum 1.6 USDT.</li>
+      <li data-i18n="mk_r4">A 5% fee is taken from the seller's proceeds only when a sale completes, and it goes to the TreasuryVault.</li>
+      <li data-i18n="mk_r5">OPUS MAGNUM can also be traded here during the sale period, at a freely set price.</li>
+      <li data-i18n="mk_r6">If the sale fails, the market freezes automatically: listings return to their sellers, and refunds follow the current holder of each Pass.</li>
+      <li data-i18n="mk_r7">When it opens, the market page will show each Pass's reference claim value (claim amount × pool price) as information only — it is not a price guide.</li>
+    </ul>
+  </section>
+
+  <section id="more">
+    <h2 data-i18n="more_title">More</h2>
+    <p><a href="scherzo.html" data-i18n="more_scherzo">Scherzo — the second movement · Season 2 (planned). Coming soon.</a></p>
+    <p><a href="faq.html" data-i18n="more_faq">Read the full FAQ — every answer is a fact from the contracts.</a></p>
+  </section>
+
+  <section id="contact">
+    <h2 data-i18n="cs_title">Contact us</h2>
+    <p data-i18n="cs_text">Questions about SYMPHONY? Send a message — replies go to the email address you enter.</p>
+    <form id="csForm" method="POST" action="https://api.web3forms.com/submit">
+      <input type="hidden" name="access_key" id="csAccessKey" value="">
+      <input type="hidden" name="subject" value="SYMPHONY website contact">
+      <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off">
+      <label data-i18n="cs_name">Your name</label>
+      <input type="text" name="name" required>
+      <label data-i18n="cs_email">Your email</label>
+      <input type="email" name="email" required>
+      <label data-i18n="cs_message">Message</label>
+      <textarea name="message" rows="5" required></textarea>
+      <div class="cf-turnstile" id="turnstileBox" data-sitekey=""></div>
+      <button type="submit" data-i18n="cs_send">Send message</button>
+      <p class="status" id="csStatus"></p>
+    </form>
+  </section>
+</main>
+<footer>
+  <div class="inner">
+    <h3 data-i18n="ft_title">Terms, in plain language</h3>
+    <p data-i18n="ft_1">SYMPHONY is not affiliated with Binance or BNB Chain. Participation requires a Binance Agent ID and a wallet on BNB Smart Chain; you need a small amount of BNB for gas and USDT (BSC) for purchases.</p>
+    <p data-i18n="ft_2">Nothing on this site is a promise of profit or return. The OPUS price is set by a public liquidity pool and by the market; it can fall, including below the opening price, and a Pass or OPUS can lose value.</p>
+    <p data-i18n="ft_3">★ Claiming works by burning NFTs, one by one. Burning is permanent and irreversible. Bonus claim windows (Soundcheck, Prelude bonus, Encore choice) last 30 days from graduation; unclaimed bonus shares are burned.</p>
+    <p data-i18n="ft_4">If the sale does not sell out, buyers are refunded 100% of USDT during the 14-day refund window (claiming a refund burns the Pass). Amounts not claimed within their windows stay locked in the contracts.</p>
+    <p data-i18n="ft_5">All SYMPHONY contracts are immutable and open-source, verified on Sourcify. The English version of this site is the authoritative text.</p>
+    <p>SYMPHONY ($OPUS) — Rhapsody No. 1 · BNB Chain</p>
+    <p><a class="xlink" href="https://x.com/symphonyopus" target="_blank" rel="noopener" data-i18n-aria="ft_x_aria" aria-label="SYMPHONY on X — @symphonyopus (opens in a new tab)"><svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>@symphonyopus</a></p>
+    <p><a href="#" id="replayIntroLink" data-i18n="intro_replay">Replay intro</a></p>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script src="config.js"></script>
+<script src="abi.js"></script>
+<script src="i18n.js"></script>
+<script src="melody.js"></script>
+<script src="app.js"></script>
+<script src="intro.js"></script>
+</body>
+</html>

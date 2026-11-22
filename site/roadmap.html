@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap — SYMPHONY ($OPUS)</title>
+<meta name="description" content="SYMPHONY ($OPUS) roadmap — the locked milestones of Rhapsody No. 1 traced as numbered points on one guitar neck, from Prelude to Scherzo (TBA).">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">SYMPHONY</a>
+  <nav>
+    <a href="index.html#prelude" data-i18n="nav_prelude">Prelude</a>
+    <a href="index.html#soundcheck" data-i18n="nav_soundcheck">Soundcheck</a>
+    <a href="index.html#presale" data-i18n="nav_presale">Presale</a>
+    <a href="index.html#sale" data-i18n="nav_sale">Sale</a>
+    <a href="index.html#market" data-i18n="nav_market">Market</a>
+    <a href="roadmap.html" data-i18n="nav_roadmap">Roadmap</a>
+    <a href="scherzo.html" data-i18n="nav_scherzo">Scherzo</a>
+    <a href="faq.html" data-i18n="nav_faq">FAQ</a>
+    <a href="index.html#contact" data-i18n="nav_contact">Contact</a>
+  </nav>
+  <div class="spacer"></div>
+  <select id="langSelect" aria-label="Language">
+    <option value="en">English</option>
+    <option value="zh-Hans">简体中文</option>
+    <option value="ja">日本語</option>
+    <option value="id">Bahasa Indonesia</option>
+    <option value="vi">Tiếng Việt</option>
+  </select>
+  <button id="soundToggleBtn" type="button" class="ghost">🔊 Sound on</button>
+</header>
+<main>
+  <section>
+    <h2 data-i18n="rm_title">Roadmap — the score so far</h2>
+    <p class="muted" data-i18n="rm_intro">Every milestone of Season 1 is a point on one guitar neck. The numbered dots trace the journey from Prelude to the final point — still unpressed. Every date here is written in the contracts or locked in the design; if a milestone is not on this neck, it is not promised anywhere.</p>
+    <p class="fret-caption" data-i18n="rm_caption">The Season 1 journey, on one guitar neck</p>
+
+    <!-- Fretboard diagram: 6 strings, the nut at the left, string names
+         on the right (E A D G B E, top to bottom, as on a chord chart).
+         Ten numbered dots trace the journey across the whole neck;
+         dot 7 (Graduation) is grand, dot 10 (Scherzo) is hollow —
+         the note not yet pressed — beyond the season's end bar. -->
+    <div class="fret-wrap">
+      <svg class="fret-svg" viewBox="0 0 1100 470" role="img" aria-label="Guitar fretboard roadmap diagram">
+        <defs>
+          <radialGradient id="dotg" cx="35%" cy="30%" r="80%">
+            <stop offset="0%" stop-color="#f7e08a"/>
+            <stop offset="55%" stop-color="#d4af37"/>
+            <stop offset="100%" stop-color="#a37f1d"/>
+          </radialGradient>
+        </defs>
+        <circle cx="240" cy="34" r="2" fill="#f0d47a" opacity="0.3"/><circle cx="620" cy="22" r="1.6" fill="#f0d47a" opacity="0.28"/>
+        <circle cx="940" cy="40" r="2" fill="#f0d47a" opacity="0.3"/><circle cx="430" cy="438" r="1.8" fill="#f0d47a" opacity="0.25"/>
+        <circle cx="830" cy="442" r="1.6" fill="#f0d47a" opacity="0.28"/>
+        <!-- board -->
+        <rect class="fb-board" x="70" y="92" width="950" height="296" rx="10"/>
+        <!-- frets -->
+        <g class="fb-frets">
+          <line x1="185" y1="92" x2="185" y2="388"/><line x1="285" y1="92" x2="285" y2="388"/>
+          <line x1="380" y1="92" x2="380" y2="388"/><line x1="470" y1="92" x2="470" y2="388"/>
+          <line x1="555" y1="92" x2="555" y2="388"/><line x1="635" y1="92" x2="635" y2="388"/>
+          <line x1="710" y1="92" x2="710" y2="388"/><line x1="780" y1="92" x2="780" y2="388"/>
+          <line x1="845" y1="92" x2="845" y2="388"/>
+        </g>
+        <!-- season-end double bar, before the unpressed point -->
+        <rect class="fb-endbar" x="900" y="92" width="3" height="296"/>
+        <rect class="fb-endbar" x="910" y="92" width="7" height="296"/>
+        <!-- strings: low E (top) to high E (bottom), thinning as they go -->
+        <g class="fb-strings">
+          <line x1="74" y1="120" x2="1016" y2="120" stroke-width="3"/>
+          <line x1="74" y1="168" x2="1016" y2="168" stroke-width="2.6"/>
+          <line x1="74" y1="216" x2="1016" y2="216" stroke-width="2.3"/>
+          <line x1="74" y1="264" x2="1016" y2="264" stroke-width="2"/>
+          <line x1="74" y1="312" x2="1016" y2="312" stroke-width="1.7"/>
+          <line x1="74" y1="360" x2="1016" y2="360" stroke-width="1.4"/>
+        </g>
+        <!-- nut -->
+        <rect class="fb-nut" x="78" y="92" width="8" height="296"/>
+        <line class="fb-frets" x1="96" y1="92" x2="96" y2="388"/>
+        <!-- string names, right side, top to bottom: E A D G B E -->
+        <g class="fb-strlabels">
+          <text x="1048" y="120">E</text><text x="1048" y="168">A</text>
+          <text x="1048" y="216">D</text><text x="1048" y="264">G</text>
+          <text x="1048" y="312">B</text><text x="1048" y="360">E</text>
+        </g>
+        <!-- the ten points of the journey -->
+        <g><circle class="fb-dot" cx="138" cy="264" r="22"/><text class="fb-num" x="138" y="264">1</text></g>
+        <g><circle class="fb-dot" cx="235" cy="168" r="22"/><text class="fb-num" x="235" y="168">2</text></g>
+        <g><circle class="fb-dot" cx="332" cy="312" r="22"/><text class="fb-num" x="332" y="312">3</text></g>
+        <g><circle class="fb-dot" cx="425" cy="120" r="22"/><text class="fb-num" x="425" y="120">4</text></g>
+        <g><circle class="fb-dot" cx="512" cy="360" r="22"/><text class="fb-num" x="512" y="360">5</text></g>
+        <g><circle class="fb-dot" cx="595" cy="216" r="22"/><text class="fb-num" x="595" y="216">6</text></g>
+        <g class="fb-grand"><circle class="fb-halo" cx="672" cy="264" r="37"/><circle class="fb-dot" cx="672" cy="264" r="28"/><text class="fb-num fb-num-grand" x="672" y="264">7</text></g>
+        <g><circle class="fb-dot" cx="745" cy="168" r="22"/><text class="fb-num" x="745" y="168">8</text></g>
+        <g><circle class="fb-dot" cx="812" cy="312" r="22"/><text class="fb-num" x="812" y="312">9</text></g>
+        <g><circle class="fb-dot-hollow" cx="965" cy="216" r="22"/><text class="fb-num fb-num-hollow" x="965" y="216">10</text></g>
+      </svg>
+    </div>
+
+    <!-- Legend: the same ten milestones, keyed to the dots -->
+    <div class="rm-legend">
+      <div class="rm-row"><span class="rm-num">1</span><div class="rm-body"><p class="rm-date" data-i18n="rm_d1">22 Nov 2026</p><p data-i18n="rm_t1">Phase 1 goes live: Prelude registration opens and Soundcheck begins. Registration is free (gas only), one per Agent ID; check-ins are free, once a day (UTC).</p></div></div>
+      <div class="rm-row"><span class="rm-num">2</span><div class="rm-body"><p class="rm-date" data-i18n="rm_d2">5 Dec 2026</p><p data-i18n="rm_t2">The first Full Score sets can be completed — 14 days of Soundcheck — and the first OPUS MAGNUM is minted.</p></div></div>
+      <div class="rm-row"><span class="rm-num">3</span><div class="rm-body"><p class="rm-date" data-i18n="rm_d3">Early Dec 2026</p><p data-i18n="rm_t3">The sale contracts (Phase 2) are deployed and verified on Sourcify, ready for the sale.</p></div></div>
+      <div class="rm-row"><span class="rm-num">4</span><div class="rm-body"><p class="rm-date" data-i18n="rm_d4">12 Dec 2026 · 12:00 UTC</p><p data-i18n="rm_t4">The Rhapsody No. 1 · Season 1 sale opens. The first 48 hours are for Prelude registrants only. Prelude registration closes at this exact moment.</p></div></div>
+      <div class="rm-row"><span class="rm-num">5</span><div class="rm-body"><p class="rm-date" data-i18n="rm_d5">14 Dec 2026 · 12:00 UTC</p><p data-i18n="rm_t5">The sale opens to all Binance Agent ID holders.</p></div></div>
+      <div class="rm-row"><span class="rm-num">6</span><div class="rm-body"><p class="rm-date" data-i18n="rm_d6">During the sale</p><p data-i18n="rm_t6">The official Market is live, and the $OPUS Presale opens the moment Tier 1 (Overture) sells out.</p></div></div>
+      <div class="rm-row"><span class="rm-num grand">7</span><div class="rm-body"><p class="rm-date" data-i18n="rm_d7">30 Dec 2026 · 12:00 UTC</p><p data-i18n="rm_t7">The verdict. If all 5,000 Passes have sold, the sale has graduated: the PancakeSwap pool opens with 175,000,000 OPUS + 6,750 USDT, the LP is burned, and all burn-to-claim opens. If the Passes sold out early, minting already stopped — the pool and the claims still wait for this moment. The Market closes at the verdict.</p></div></div>
+      <div class="rm-row"><span class="rm-num">8</span><div class="rm-body"><p class="rm-date" data-i18n="rm_d8">30 Dec 2026 – 13 Jan 2027</p><p data-i18n="rm_t8">Only if the sale has not sold out: the sale has failed, and the 100% refund window runs for 14 days from the verdict. Refunds are claimed by burning the Pass; unclaimed refunds stay locked in the contract forever.</p></div></div>
+      <div class="rm-row"><span class="rm-num">9</span><div class="rm-body"><p class="rm-date" data-i18n="rm_d9">30 Dec 2026 – 29 Jan 2027</p><p data-i18n="rm_t9">A 30-day claim window from the verdict: OPUS MAGNUM claims, Prelude bonus and referral claims, and the Encore election.</p></div></div>
+      <div class="rm-row"><span class="rm-num hollow">10</span><div class="rm-body"><p class="rm-date" data-i18n="rm_d10">TBA</p><p data-i18n="rm_t10">Scherzo — the second movement · Season 2 (planned). Nothing else is announced: no dates, no numbers, no mechanics.</p></div></div>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="inner">
+    <h3 data-i18n="ft_title">Terms, in plain language</h3>
+    <p data-i18n="ft_1">SYMPHONY is not affiliated with Binance or BNB Chain. Participation requires a Binance Agent ID and a wallet on BNB Smart Chain; you need a small amount of BNB for gas and USDT (BSC) for purchases.</p>
+    <p data-i18n="ft_2">Nothing on this site is a promise of profit or return. The OPUS price is set by a public liquidity pool and by the market; it can fall, including below the opening price, and a Pass or OPUS can lose value.</p>
+    <p data-i18n="ft_3">★ Claiming works by burning NFTs, one by one. Burning is permanent and irreversible. Bonus claim windows (Soundcheck, Prelude bonus, Encore choice) last 30 days from graduation; unclaimed bonus shares are burned.</p>
+    <p data-i18n="ft_4">If the sale does not sell out, buyers are refunded 100% of USDT during the 14-day refund window (claiming a refund burns the Pass). Amounts not claimed within their windows stay locked in the contracts.</p>
+    <p data-i18n="ft_5">All SYMPHONY contracts are immutable and open-source, verified on Sourcify. The English version of this site is the authoritative text.</p>
+    <p>SYMPHONY ($OPUS) — Rhapsody No. 1 · BNB Chain</p>
+    <p><a class="xlink" href="https://x.com/symphonyopus" target="_blank" rel="noopener" data-i18n-aria="ft_x_aria" aria-label="SYMPHONY on X — @symphonyopus (opens in a new tab)"><svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" focusable="false"><path fill="currentColor" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>@symphonyopus</a></p>
+  </div>
+</footer>
+<script src="config.js"></script>
+<script src="i18n.js"></script>
+<script src="melody.js"></script>
+</body>
+</html>

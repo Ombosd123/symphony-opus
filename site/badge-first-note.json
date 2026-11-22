@@ -1,0 +1,19 @@
+{
+  "name": "SYMPHONY Soundcheck — FIRST NOTE",
+  "description": "Awarded for the first day of a Soundcheck check-in streak. Soulbound forever; never tradable, never burned.",
+  "image": "https://symphony-opus.pages.dev/assets/badge-first-note.webp",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Rhapsody No. 1"
+    },
+    {
+      "trait_type": "Milestone",
+      "value": "Day 1"
+    },
+    {
+      "trait_type": "Transferable",
+      "value": "No — soulbound"
+    }
+  ]
+}

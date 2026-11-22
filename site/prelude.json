@@ -1,0 +1,19 @@
+{
+  "name": "SYMPHONY Prelude Pass — Rhapsody No. 1",
+  "description": "Soulbound registration pass for SYMPHONY ($OPUS), Rhapsody No. 1. One per Binance Agent ID holder. Burn it after graduation to claim the Prelude conversion bonus.",
+  "image": "https://symphony-opus.pages.dev/assets/prelude-pass.webp",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Rhapsody No. 1"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Prelude Pass"
+    },
+    {
+      "trait_type": "Transferable",
+      "value": "No — soulbound"
+    }
+  ]
+}

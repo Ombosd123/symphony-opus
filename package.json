@@ -1,0 +1,1 @@
+{"dependencies":{"ethers":"^6.17.0","ganache":"^7.9.2","solc":"^0.8.38"},"description":"SYMPHONY ($OPUS) — phase 1 contracts, tests and site","license":"MIT","name":"symphony","private":true,"version":"1.0.0"}

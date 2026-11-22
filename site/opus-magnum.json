@@ -1,0 +1,19 @@
+{
+  "name": "SYMPHONY — OPUS MAGNUM",
+  "description": "Awarded for completing the full 14-day Soundcheck set. This is the claim instrument for a pro-rata share of the 30,000,000 OPUS Soundcheck pool (cap 60,000 OPUS per person), payable only if the sale graduates. Claiming burns this NFT.",
+  "image": "https://symphony-opus.pages.dev/assets/opus-magnum.webp",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Rhapsody No. 1"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Complete Set"
+    },
+    {
+      "trait_type": "Transferable",
+      "value": "Official market only"
+    }
+  ]
+}

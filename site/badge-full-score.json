@@ -1,0 +1,19 @@
+{
+  "name": "SYMPHONY Soundcheck — FULL SCORE",
+  "description": "Awarded at a 14-day Soundcheck check-in streak. Soulbound forever; never tradable, never burned.",
+  "image": "https://symphony-opus.pages.dev/assets/badge-full-score.webp",
+  "attributes": [
+    {
+      "trait_type": "Edition",
+      "value": "Rhapsody No. 1"
+    },
+    {
+      "trait_type": "Milestone",
+      "value": "Day 14"
+    },
+    {
+      "trait_type": "Transferable",
+      "value": "No — soulbound"
+    }
+  ]
+}
