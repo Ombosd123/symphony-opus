@@ -30,7 +30,7 @@ window.SYMPHONY_CONFIG = {
   // Create a free Web3Forms access key for the project inbox and paste
   // it here before publishing. The destination inbox is configured
   // inside Web3Forms — it is never written on this page.
-  WEB3FORMS_ACCESS_KEY: "REPLACE_WITH_WEB3FORMS_ACCESS_KEY",
+  WEB3FORMS_ACCESS_KEY: "164fa6a4-2bbf-41c3-8810-93ecd71a142c",
   // Cloudflare Turnstile site key for the contact form (spam protection).
-  TURNSTILE_SITE_KEY: "REPLACE_WITH_TURNSTILE_SITE_KEY",
+  TURNSTILE_SITE_KEY: "0x4AAAAAAGNKTfR0LzWODpoe",
 };
