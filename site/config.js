@@ -9,9 +9,9 @@
 // ============================================================
 window.SYMPHONY_CONFIG = {
   // --- Contract addresses (BNB Chain mainnet) — TO FILL AFTER DEPLOY ---
-  PRELUDE_ADDRESS: "", // PreludeRegistry
-  SOUNDCHECK_ADDRESS: "", // Soundcheck
-  VAULT_ADDRESS: "", // TreasuryVault
+  PRELUDE_ADDRESS: "0xeA2FC84d8B87cB8CbCd27bda65761625BB7dB678", // PreludeRegistry
+  SOUNDCHECK_ADDRESS: "0xf29BB5C9266e4bD829be23cC9878e241fb85DD71", // Soundcheck
+  VAULT_ADDRESS: "0x4d32E4a76C7389445F9CB76f7098E4D50E0503A7", // TreasuryVault
 
   // --- Fixed network / ecosystem values ---
   AGENT_ID_REGISTRY: "0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F",
