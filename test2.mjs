@@ -18,6 +18,10 @@
 //   C — gerbang 500 belum terpenuhi saat 12 Des: buy revert; setelah
 //       pendaftar ke-500 masuk, sale membuka (openedAt terpatri) dan
 //       jendela 48 jam berjalan dari openedAt.
+//   D — pagar referral & bonus badge (amendemen SPEC 18, 2026-11-23):
+//       akru referral berhenti tepat di 15 jt, bakar finalize = 0,
+//       bonus badge +5.000 di Premiere & Encore, cap 10 Pass/wallet
+//       (Pass ke-11 dari market tanpa bonus).
 // Jalankan: node test2.mjs
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -251,6 +255,7 @@ async function deployStack({ regEnd, saleStart, verdict }) {
     await prelude.getAddress(), await sc.getAddress(), await sale.getAddress()
   );
   const scherzoKey = await deploy(C.ScherzoKey, deployer);
+  const badgeReg = await deploy(C.MockAgentId, deployer);
   const opus = await deploy(
     C.OpusToken, deployer,
     await sale.getAddress(), await distributor.getAddress(),
@@ -269,7 +274,8 @@ async function deployStack({ regEnd, saleStart, verdict }) {
   await distributor.bindToken(await opus.getAddress(), GL);
   await scherzoKey.bindSale(saleAddr, GL);
   await sale.bindScherzoKey(await scherzoKey.getAddress(), GL);
-  return { vault, prelude, sc, pass, factory, router, sale, market, vesting, presale, distributor, opus, scherzoKey };
+  await sale.bindBadgeRegistry(await badgeReg.getAddress(), GL);
+  return { vault, prelude, sc, pass, factory, router, sale, market, vesting, presale, distributor, opus, scherzoKey, badgeReg };
 }
 
 // ======================================================================
@@ -289,6 +295,7 @@ await giveAgentIds([
   addrs[2], addrs[3], addrs[4], addrs[5], addrs[7], addrs[8], addrs[9], // BUKAN addrs[6] (noAgent)
   ...addrs.slice(10, 510),
   ...addrs.slice(520, 575),
+  addrs[580],
 ]);
 
 // Alokasi token tercetak sekali (SPEC 6)
@@ -306,11 +313,15 @@ eq(Number(await A.scherzoKey.totalKeys()), 0, "A: belum ada kunci sebelum ada kl
 await expectRevert(A.scherzoKey.connect(anyone).mintKey, [addrs[7]], "only the sale", "A: mintKey oleh non-sale revert");
 await expectRevert(A.scherzoKey.bindSale, [addrs[7]], "sale already bound", "A: bindSale di kontrak kunci hanya sekali");
 await expectRevert(A.sale.bindScherzoKey, [addrs[7]], "key already bound", "A: bindScherzoKey di sale hanya sekali");
+await expectRevert(A.sale.bindBadgeRegistry, [addrs[7]], "badge already bound", "A: bindBadgeRegistry hanya sekali");
+eq((await A.sale.REFERRAL_POOL_CAP()) + (await A.sale.BADGE_POOL_CAP()), await A.sale.REFERRAL_ALLOC(), "A: pagar referral 15 jt + kolam badge 10 jt = alokasi 25 jt");
 await expectRevert(A.scherzoKey.tokenURI, [1], "nonexistent token", "A: tokenURI kunci yang belum terbit revert");
 
 // Registrasi Prelude: hub & reg10 polos; reg11 via registerRef(reg10);
 // 55 flock via registerRef(hub); sisanya polos. Total 556 ≥ 500.
 await A.prelude.connect(hub).register(GL);
+await A.prelude.connect(signers[580]).register(GL); // holder badge AgentQuest (SPEC 18)
+await A.badgeReg.give(addrs[580]);
 await A.prelude.connect(regA(10)).register(GL);
 await A.prelude.connect(regA(11)).registerRef(addrs[20], GL); // referrer = reg10 (signers[20])
 for (const s of flockA) await A.prelude.connect(s).registerRef(addrs[8], GL);
@@ -318,7 +329,7 @@ for (let i = 0; i < 500; i++) {
   if (i === 10 || i === 11) continue;
   await A.prelude.connect(regA(i)).register(GL);
 }
-eq(Number(await A.prelude.count()), 556, "A: 556 pendaftar Prelude (≥ 500)");
+eq(Number(await A.prelude.count()), 557, "A: 557 pendaftar Prelude (≥ 500)");
 eq(Number(await A.prelude.referralCount(addrs[8])), 55, "A: referralCount hub = 55 (mentah)");
 eq(Number(await A.prelude.referralCount(addrs[20])), 1, "A: referralCount reg10 = 1");
 
@@ -373,6 +384,8 @@ const idsReg5 = await buyA(regA(5), 10);
 const idsReg6 = await buyA(regA(6), 10);
 const idsReg7 = await buyA(regA(7), 10);
 eq(Number(await A.sale.totalSold()), 60, "A: totalSold 60");
+const idsBadgeA = await buyA(signers[580], 10);
+eq(Number(await A.sale.totalSold()), 70, "A: totalSold 70 setelah pembeli badge");
 
 // Hari 41–42: check-in berlanjut; nonReg masih ditolak di hari 41.
 await advanceTo(41);
@@ -392,7 +405,7 @@ await A.sc.connect(comp2).repairStreak(GL);
 eq(await A.sc.poolSharePaid(addrs[12]), E("0.05"), "A: poolSharePaid comp2 = 0,05");
 await A.sc.connect(comp2).checkIn(GL);
 await A.sc.connect(comp1).checkIn(GL);
-await buyA(nonReg, 10);
+const idsNonReg = await buyA(nonReg, 10);
 eq(Number(await A.sale.primaryPurchases(addrs[5])), 10, "A: non-pendaftar bisa membeli setelah 48 jam");
 
 async function bulkToA(target) {
@@ -498,7 +511,7 @@ ok((await pair.balanceOf(DEAD)) > 0n, "A: LP DIBAKAR ke alamat mati");
 eq(await usdt.balanceOf(await A.vault.getAddress()), E("756.24"), "A: vault = 750 sale + 6 presale + 0,19 fee market + 0,05 repair");
 eq(Number(await A.sc.outcome()), 1, "A: Soundcheck tertanda Graduated");
 eq(await usdt.balanceOf(await A.sc.getAddress()), 0n, "A: bagian pool Soundcheck tersapu habis");
-eq(await A.opus.totalSupply(), E(575_050_000), "A: sisa referral 24,95 jt dibakar di finalize");
+eq(await A.opus.totalSupply(), E(585_050_000), "A: bakar finalize 14,95 jt (25 jt − 50 rb referral terakru − 10 jt kolam badge tertahan)");
 
 // Presale: selesaikan OPUS tak terjual + klaim pembeli
 await A.presale.connect(anyone).settleUnsold(GL);
@@ -549,6 +562,19 @@ eq(Number(await A.sale.scherzoOvertureSeats(addrs[16])), 2, "A: catatan internal
 eq(Number(await A.scherzoKey.keyOf(addrs[16])), 2, "A: kunci reg6 TETAP #2 — tidak ada kunci kedua untuk wallet yang sama");
 eq(Number(await A.scherzoKey.totalKeys()), 2, "A: totalKeys tetap 2 setelah Encore kedua reg6");
 eq(Number(await A.scherzoKey.balanceOf(addrs[16])), 1, "A: balanceOf kunci reg6 tetap 1");
+
+
+// Bonus badge AgentQuest (amendemen SPEC 18): holder badge menerima
+// +5.000 OPUS per klaim Premiere; non-holder tidak menerima apa pun.
+await A.sale.connect(signers[580]).claimPremiere(idsBadgeA[0], GL);
+eq(await A.opus.balanceOf(addrs[580]), E(83_000), "A: Premiere holder badge = 78.000 + bonus badge 5.000");
+await A.sale.connect(signers[580]).claimPremiere(idsBadgeA[1], GL);
+eq(await A.opus.balanceOf(addrs[580]), E(166_000), "A: klaim badge kedua tetap +5.000");
+eq(Number(await A.sale.badgeCounted(addrs[580])), 2, "A: badgeCounted holder = 2");
+eq(await A.sale.badgePoolPaid(), E(10_000), "A: badgePoolPaid = 10.000");
+await A.sale.connect(nonReg).claimPremiere(idsNonReg[0], GL);
+eq(await A.opus.balanceOf(addrs[5]), E(78_000), "A: Premiere non-badge tepat 78.000 (tanpa bonus)");
+eq(Number(await A.sale.badgeCounted(addrs[5])), 0, "A: badgeCounted non-holder = 0");
 
 // ---------- distributor (hari 58, di dalam jendela klaim) ----------
 console.log("— Skenario A: distributor Merkle —");
@@ -789,6 +815,78 @@ await advanceTo(58);
 await CS.sale.connect(anyone).finalize(GL_BIG);
 ok(await CS.sale.failed(), "C: vonis tetap 30 Des — sale yang tertunda tetap gagal bila tak mencapai 5.000");
 eq(Number(await CS.scherzoKey.totalKeys()), 0, "C: tidak ada kunci SCHERZO (sale gagal)");
+
+// ======================================================================
+// SKENARIO D — pagar referral & bonus badge (amendemen SPEC 18)
+// ======================================================================
+console.log("— Skenario D: pagar referral 15 jt & bonus badge —");
+newScenario();
+const SD = await deployStack({ regEnd: tsOf(40), saleStart: tsOf(40), verdict: tsOf(58) });
+const refD = signers[600], badgeD = signers[601], sellerD = signers[602];
+const buyersD = signers.slice(610, 911); // 301 pembeli referral
+const fillD = signers.slice(911, 1110);  // 199 pengisi sisa (tanpa referral)
+await giveAgentIds([addrs[600], addrs[601], addrs[602], ...addrs.slice(610, 1110)]);
+await SD.badgeReg.give(addrs[601]);
+await SD.prelude.connect(refD).register(GL);
+await SD.prelude.connect(badgeD).register(GL);
+await SD.prelude.connect(sellerD).register(GL);
+for (const s of [...buyersD, ...fillD]) await SD.prelude.connect(s).register(GL);
+eq(Number(await SD.prelude.count()), 503, "D: 503 pendaftar (≥ 500)");
+await advanceTo(40);
+const boughtD = new Set();
+async function buyD(signer, count, referrer = ZERO) {
+  const addr = await signer.getAddress();
+  if (!boughtD.has(addr)) {
+    await fundUsdt(signer, E(100));
+    await approveMax(signer, await SD.sale.getAddress());
+    boughtD.add(addr);
+  }
+  const tx = await SD.sale.connect(signer).buy(count, referrer, GL_BIG);
+  const receipt = await tx.wait();
+  return mintedOf(receipt, SD.pass);
+}
+await buyD(refD, 1); // referrer harus memegang ≥ 1 Pass
+const idsBadgeD = await buyD(badgeD, 10);
+const idsSellerD = await buyD(sellerD, 1);
+for (const s of buyersD) await buyD(s, 10, addrs[600]);
+eq(Number(await SD.sale.totalSold()), 3022, "D: totalSold 3.022 setelah pembelian referral massal");
+eq(await SD.sale.totalReferralAccrued(), E(15_000_000), "D: akru referral BERHENTI tepat di pagar 15 jt (3.010 Pass bereferral diajukan)");
+eq(await SD.sale.referralAccrued(addrs[600]), E(15_000_000), "D: referralAccrued referrer = 15 jt penuh, tidak lebih");
+// Pass ke-11 badgeD lewat market resmi (cap 10 hanya untuk primer).
+const listTxD = await SD.market.connect(sellerD).listPass(idsSellerD[0], E(1), GL);
+await listTxD.wait();
+await approveMax(badgeD, await SD.market.getAddress());
+await SD.market.connect(badgeD).buy(1, GL);
+eq(Number(await SD.pass.balanceOf(addrs[601])), 11, "D: badgeD memegang 11 Pass (10 primer + 1 market)");
+// Isi sampai habis tanpa referral, lalu vonis.
+let remainingD = 5000 - Number(await SD.sale.totalSold());
+for (const s of fillD) {
+  if (remainingD <= 0) break;
+  const n = Math.min(10, remainingD);
+  await buyD(s, n);
+  remainingD -= n;
+}
+eq(Number(await SD.sale.totalSold()), 5000, "D: totalSold 5.000 (habis)");
+await advanceTo(58);
+await SD.sale.connect(anyone).finalize(GL_BIG);
+ok(await SD.sale.graduated(), "D: sale LULUS di vonis");
+eq(await SD.opus.totalSupply(), E(600_000_000), "D: bakar referral di finalize = 0 (25 jt − 15 jt terakru − 10 jt kolam badge tertahan)");
+// Klaim badgeD: Encore (bonus berlaku) → 9 Premiere (bonus) → Pass
+// ke-11 tanpa bonus karena cap 10 Pass per wallet sudah tercapai.
+const balD = async () => await SD.opus.balanceOf(addrs[601]);
+let beforeD = await balD();
+await SD.sale.connect(badgeD).claimEncore(idsBadgeD[0], GL);
+eq((await balD()) - beforeD, E(44_000), "D: Encore holder badge = 39.000 langsung + bonus badge 5.000");
+for (let i = 1; i < 10; i++) {
+  beforeD = await balD();
+  await SD.sale.connect(badgeD).claimPremiere(idsBadgeD[i], GL);
+  eq((await balD()) - beforeD, E(83_000), `D: Premiere badge ke-${i + 1} = 78.000 + 5.000`);
+}
+eq(Number(await SD.sale.badgeCounted(addrs[601])), 10, "D: badgeCounted berhenti tepat di cap 10");
+eq(await SD.sale.badgePoolPaid(), E(50_000), "D: badgePoolPaid = 50.000 (10 × 5.000)");
+beforeD = await balD();
+await SD.sale.connect(badgeD).claimPremiere(idsSellerD[0], GL);
+eq((await balD()) - beforeD, E(78_000), "D: Pass ke-11 (dari market) TANPA bonus — cap per wallet tercapai");
 
 console.log(`\n=== HASIL FASE 2: ${passed} PASS, ${failed} FAIL ===`);
 if (failed > 0) process.exit(1);

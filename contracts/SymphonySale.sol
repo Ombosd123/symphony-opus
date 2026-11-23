@@ -53,6 +53,12 @@ interface IScherzoKeyForSale {
     function mintKey(address to) external returns (uint256);
 }
 
+/// @notice Interface kontrak badge AgentQuest (perk partner —
+///         amendemen SPEC 18). Hanya balanceOf yang dibaca.
+interface IBadgeForSale {
+    function balanceOf(address owner) external view returns (uint256);
+}
+
 /// @notice PancakeSwap V2 (produksi BSC: factory
 ///         0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73, router
 ///         0x10ED43C718714eb63d5aA57B78B54704E256024E).
@@ -111,6 +117,15 @@ interface IPancakePair {
 ///           tenggat. Self-referral dilarang (preseden registerRef
 ///           fase 1). Sisa alokasi yang tidak terakru DIBAKAR di
 ///           finalize jalur lulus.
+///         - Pagar alokasi (SPEC 18): alokasi 25 jt yang sama dipagari
+///           dua kolam — akru referral berhenti pada REFERRAL_POOL_CAP
+///           15 jt; kolam bonus badge BADGE_POOL_CAP 10 jt tidak ikut
+///           dibakar di finalize dan tetap di kontrak untuk klaim.
+///         - Bonus badge AgentQuest (perk partner, SPEC 18): wallet
+///           pemegang ≥1 badge AgentQuest (kontrak diikat satu kali
+///           lewat bindBadgeRegistry) menerima +5.000 OPUS per Pass
+///           pada transaksi burn klaim (Premiere maupun Encore), maks
+///           10 Pass per wallet, selama kolam badge masih ada.
 ///         - VONIS TANGGAL TETAP pada VERDICT (produksi 1798632000 =
 ///           30 Des 2026 12:00 UTC): finalize() permissionless —
 ///           totalSold == 5.000 → LULUS: sapu hasil presale (90% pool /
@@ -158,6 +173,10 @@ contract SymphonySale {
     uint256 public constant PRELUDE_WINDOW = 48 hours;
     uint256 public constant REFERRAL_REWARD = 5_000 ether;
     uint256 public constant REFERRAL_ALLOC = 25_000_000 ether;
+    uint256 public constant REFERRAL_POOL_CAP = 15_000_000 ether;
+    uint256 public constant BADGE_POOL_CAP = 10_000_000 ether;
+    uint256 public constant BADGE_BONUS = 5_000 ether;
+    uint256 public constant BADGE_MAX_PASSES = 10;
     uint256 public constant POOL_OPUS = 167_500_000 ether;
     uint256 public constant POOL_USDT = 6_750 ether;
     uint256 public constant TREASURY_USDT = 750 ether;
@@ -187,6 +206,7 @@ contract SymphonySale {
     IOpusSale public opus;
     IPresaleForSale public presale;
     IScherzoKeyForSale public scherzoKey;
+    IBadgeForSale public badgeRegistry;
 
     // ------------------------------------------------------------------
     // State sale
@@ -206,6 +226,10 @@ contract SymphonySale {
     mapping(address => uint256) public primaryPurchases;
     mapping(address => uint256) public referralAccrued;
     uint256 public totalReferralAccrued;
+    /// @notice Pass yang sudah menerima bonus badge per wallet (cap
+    ///         BADGE_MAX_PASSES) & total kolam badge yang terbayar.
+    mapping(address => uint256) public badgeCounted;
+    uint256 public badgePoolPaid;
 
     // ------------------------------------------------------------------
     // State Encore
@@ -233,6 +257,7 @@ contract SymphonySale {
     event TokenBound(address indexed token);
     event PresaleBound(address indexed presale);
     event ScherzoKeyBound(address indexed key);
+    event BadgeRegistryBound(address indexed badge);
     event SaleOpened(uint256 openedAt);
     event PassBought(address indexed buyer, uint256 count, uint256 totalPaid, address referrer);
     event Graduated(uint256 poolUsdt, uint256 presaleToPool, uint256 soundcheckSwept, uint256 referralBurned);
@@ -244,6 +269,7 @@ contract SymphonySale {
     event EncoreBonusClaimed(address indexed holder, uint256 amount);
     event EncoreRemainderBurned(uint256 amount);
     event ReferralClaimed(address indexed referrer, uint256 amount);
+    event BadgeBonusPaid(address indexed holder, uint256 indexed tokenId, uint256 amount);
 
     constructor(
         address registry_,
@@ -304,6 +330,14 @@ contract SymphonySale {
         require(key_ != address(0), "SymphonySale: key zero address");
         scherzoKey = IScherzoKeyForSale(key_);
         emit ScherzoKeyBound(key_);
+    }
+
+    function bindBadgeRegistry(address badge_) external {
+        require(msg.sender == deployer, "SymphonySale: not the deployer");
+        require(address(badgeRegistry) == address(0), "SymphonySale: badge already bound");
+        require(badge_ != address(0), "SymphonySale: badge zero address");
+        badgeRegistry = IBadgeForSale(badge_);
+        emit BadgeRegistryBound(badge_);
     }
 
     // ------------------------------------------------------------------
@@ -398,9 +432,17 @@ contract SymphonySale {
         primaryPurchases[msg.sender] += count;
 
         if (hasReferrer) {
-            uint256 accrued = REFERRAL_REWARD * count;
-            referralAccrued[referrer] += accrued;
-            totalReferralAccrued += accrued;
+            // Kolam referral berpagar (SPEC 18): akru hanya sampai
+            // REFERRAL_POOL_CAP, dihitung per Pass utuh.
+            uint256 room = totalReferralAccrued >= REFERRAL_POOL_CAP
+                ? 0
+                : (REFERRAL_POOL_CAP - totalReferralAccrued) / REFERRAL_REWARD;
+            uint256 credited = count < room ? count : room;
+            if (credited > 0) {
+                uint256 accrued = REFERRAL_REWARD * credited;
+                referralAccrued[referrer] += accrued;
+                totalReferralAccrued += accrued;
+            }
         }
         emit PassBought(msg.sender, count, totalPrice, referrer);
     }
@@ -459,8 +501,10 @@ contract SymphonySale {
             require(IPancakePair(pair).transfer(LP_BURN_ADDRESS, lp), "SymphonySale: LP burn failed");
         }
 
-        // Sisa alokasi referral yang tidak terakru dibakar.
-        uint256 referralBurned = REFERRAL_ALLOC - totalReferralAccrued;
+        // Sisa alokasi referral di luar kedua pagar dibakar. Kolam
+        // badge (BADGE_POOL_CAP) tetap di kontrak: bonus badge dibayar
+        // pada klaim setelah graduation (SPEC 18).
+        uint256 referralBurned = REFERRAL_ALLOC - totalReferralAccrued - BADGE_POOL_CAP;
         if (referralBurned > 0) {
             opus.burn(referralBurned);
         }
@@ -492,6 +536,24 @@ contract SymphonySale {
     // ------------------------------------------------------------------
     // Burn-to-claim (jalur lulus) — selalu satu tokenId per transaksi
     // ------------------------------------------------------------------
+    /// @notice Bonus badge AgentQuest (perk partner, SPEC 18):
+    ///         +5.000 OPUS per Pass bagi wallet pemegang badge, dibayar
+    ///         pada transaksi burn yang sama (Premiere maupun Encore).
+    ///         Berpagar ganda: maks BADGE_MAX_PASSES Pass per wallet &
+    ///         total BADGE_POOL_CAP. Tanpa badge, pagar penuh, atau
+    ///         registry belum diikat: tidak ada bonus — klaim Pass
+    ///         tetap berjalan seperti biasa.
+    function _payBadgeBonus(uint256 tokenId) internal {
+        if (address(badgeRegistry) == address(0)) return;
+        if (badgeCounted[msg.sender] >= BADGE_MAX_PASSES) return;
+        if (badgePoolPaid >= BADGE_POOL_CAP) return;
+        if (badgeRegistry.balanceOf(msg.sender) == 0) return;
+        badgeCounted[msg.sender] += 1;
+        badgePoolPaid += BADGE_BONUS;
+        require(opus.transfer(msg.sender, BADGE_BONUS), "SymphonySale: badge bonus transfer failed");
+        emit BadgeBonusPaid(msg.sender, tokenId, BADGE_BONUS);
+    }
+
     /// @notice PREMIERE: bakar satu Pass → 100% hak klaim tier-nya,
     ///         langsung. Tanpa tenggat. Tanpa syarat Agent ID.
     function claimPremiere(uint256 tokenId) external {
@@ -500,6 +562,7 @@ contract SymphonySale {
         uint256 amount = claimOfTier(pass.tierOf(tokenId));
         pass.burn(tokenId);
         require(opus.transfer(msg.sender, amount), "SymphonySale: claim transfer failed");
+        _payBadgeBonus(tokenId);
         emit PremiereClaimed(msg.sender, tokenId, amount);
     }
 
@@ -532,6 +595,7 @@ contract SymphonySale {
             scherzoKey.mintKey(msg.sender);
         }
         require(opus.transfer(msg.sender, immediate), "SymphonySale: immediate transfer failed");
+        _payBadgeBonus(tokenId);
         emit EncoreElected(msg.sender, tokenId, immediate, vested);
     }
 
