@@ -48,6 +48,17 @@ opens).
 Full design details are documented in the contract source code, which is the
 authoritative specification.
 
+## Partnerships
+
+SYMPHONY is the first **Perk Partner of AgentQuest**: AgentQuest badge holders
+who claim a Pass receive **+5,000 OPUS per Pass** (max 10 Passes per wallet),
+paid in the same claim transaction. The perk is enforced by the sale contract
+itself — the AgentQuest badge registry is bound once by the deployer — and is
+funded by a fenced 10,000,000 OPUS pool inside the 25,000,000 OPUS referral
+envelope (the sale referral itself is capped at 15,000,000 OPUS). The pool
+divides into exactly 2,000 whole bonuses, is paid first-come at claim, and
+only if the sale graduates.
+
 ## Contracts
 
 All contracts are immutable (no owner withdrawal, no pause, no upgrade) and
@@ -55,9 +66,9 @@ compiled with solc 0.8.38, optimizer 200, EVM paris.
 
 | Contract | Phase | Status |
 |---|---|---|
-| TreasuryVault | 1 | Deployment in progress — address will be listed here |
-| PreludeRegistry | 1 | Deployment in progress — address will be listed here |
-| Soundcheck | 1 | Deployment in progress — address will be listed here |
+| TreasuryVault | 1 | Deployed — 0x4d32E4a76C7389445F9CB76f7098E4D50E0503A7 (Sourcify exact match) |
+| PreludeRegistry | 1 | Deployed — 0xeA2FC84d8B87cB8CbCd27bda65761625BB7dB678 (Sourcify exact match) |
+| Soundcheck | 1 | Deployed — 0xf29BB5C9266e4bD829be23cC9878e241fb85DD71 (Sourcify exact match) |
 | OpusToken | 2 | Built and tested — deployment early December 2026 |
 | SymphonyPass | 2 | Built and tested — deployment early December 2026 |
 | SymphonySale | 2 | Built and tested — deployment early December 2026 |
@@ -70,14 +81,15 @@ compiled with solc 0.8.38, optimizer 200, EVM paris.
 ## Repository layout
 
 - `contracts/` — all Solidity sources (phase 1 + phase 2)
-- `site/` — the static website (the future Cloudflare Pages output)
+- `site/` — the static website (deployed to Cloudflare Pages)
 - `build.mjs`, `test.mjs`, `test2.mjs`, `sound-test.mjs`, `intro-test.mjs` —
-  local build and test harnesses (266 assertions across the full system)
+  local build and test harnesses (295 assertions across the full system)
 
 ## Links
 
 - X: https://x.com/symphonyopus
-- Website: coming soon
+- Website: https://symphony-opus.pages.dev
+- Perk Partner: AgentQuest — https://zainumq.github.io/agentquest/
 - Chain: BNB Chain (BSC, chainId 56)
 
 ## License
