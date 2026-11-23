@@ -1,6 +1,6 @@
 // Uji menyeluruh SYMPHONY fase 2 di EVM lokal (ganache in-process).
 // Tiga skenario tumpukan kontrak penuh (pola test.mjs fase 1):
-//   A — jalur LULUS: gerbang 500 + gerbang tanggal, jendela 48 jam
+//   A — jalur LULUS: gerbang 500 + gerbang tanggal, jendela 24 jam
 //       Prelude, tier & batas tier, referral sale, presale (buka tepat
 //       di totalSold 1.500, cap, split), market (lantai 80%, fee 5%,
 //       gate pembeli, Magnum), habis lebih awal tetap terkunci sampai
@@ -17,7 +17,7 @@
 //       Soundcheck markFailed + klaim pool share, distributor dibakar.
 //   C — gerbang 500 belum terpenuhi saat 12 Des: buy revert; setelah
 //       pendaftar ke-500 masuk, sale membuka (openedAt terpatri) dan
-//       jendela 48 jam berjalan dari openedAt.
+//       jendela 24 jam berjalan dari openedAt.
 //   D — pagar referral & bonus badge (amendemen SPEC 18, 2026-11-23):
 //       akru referral berhenti tepat di 15 jt, bakar finalize = 0,
 //       bonus badge +5.000 di Premiere & Encore, cap 10 Pass/wallet
@@ -340,13 +340,13 @@ await expectRevert(A.sale.connect(regA(0)).buy, [1, ZERO], "sale has not started
 
 // ---------- hari ke-40: sale dibuka ----------
 await advanceTo(40);
-console.log("— Skenario A: pembukaan & jendela 48 jam —");
+console.log("— Skenario A: pembukaan & jendela 24 jam —");
 const comp1 = regA(1), comp2 = regA(2); // penyelesai Soundcheck
 await A.sc.connect(comp1).checkIn(GL);
 await A.sc.connect(comp2).checkIn(GL);
 await fundUsdt(nonReg, E(100));
 await approveMax(nonReg, await A.sale.getAddress());
-await expectRevert(A.sale.connect(nonReg).buy, [1, ZERO], "Prelude registrants only", "A: non-pendaftar ditolak di 48 jam pertama");
+await expectRevert(A.sale.connect(nonReg).buy, [1, ZERO], "Prelude registrants only", "A: non-pendaftar ditolak di 24 jam pertama");
 await expectRevert(A.sale.connect(noAgent).buy, [1, ZERO], "not an Agent ID holder", "A: tanpa Agent ID ditolak");
 
 const mintedOf = async (receipt, passContract) => {
@@ -387,16 +387,18 @@ eq(Number(await A.sale.totalSold()), 60, "A: totalSold 60");
 const idsBadgeA = await buyA(signers[580], 10);
 eq(Number(await A.sale.totalSold()), 70, "A: totalSold 70 setelah pembeli badge");
 
-// Hari 41–42: check-in berlanjut; nonReg masih ditolak di hari 41.
+// Hari 41–42: check-in berlanjut; jendela Prelude 24 jam sudah
+// lewat di hari ke-41 (openedAt hari 40 + 24 jam) — publik terbuka.
 await advanceTo(41);
 await A.sc.connect(comp1).checkIn(GL);
 await A.sc.connect(comp2).checkIn(GL);
-await expectRevert(A.sale.connect(nonReg).buy, [1, ZERO], "Prelude registrants only", "A: hari ke-41 masih jendela Prelude");
+const idsNonReg = await buyA(nonReg, 10);
+eq(Number(await A.sale.primaryPurchases(addrs[5])), 10, "A: non-pendaftar bisa membeli di hari ke-41 (jendela 24 jam berakhir)");
 await advanceTo(42);
 await A.sc.connect(comp1).checkIn(GL);
 // comp2 bolong hari 42 (untuk repair besok)
 
-// Hari 43: repair comp2, jendela publik terbuka, pembelian massal.
+// Hari 43: repair comp2, pembelian massal.
 await advanceTo(43);
 console.log("— Skenario A: publik, tier, presale —");
 await usdt.mint(addrs[12], E(1), GL);
@@ -405,8 +407,6 @@ await A.sc.connect(comp2).repairStreak(GL);
 eq(await A.sc.poolSharePaid(addrs[12]), E("0.05"), "A: poolSharePaid comp2 = 0,05");
 await A.sc.connect(comp2).checkIn(GL);
 await A.sc.connect(comp1).checkIn(GL);
-const idsNonReg = await buyA(nonReg, 10);
-eq(Number(await A.sale.primaryPurchases(addrs[5])), 10, "A: non-pendaftar bisa membeli setelah 48 jam");
 
 async function bulkToA(target) {
   for (const s of regsA) {
@@ -805,12 +805,12 @@ await CS.sale.connect(anyone).openSale(GL);
 ok(Number(await CS.sale.openedAt()) >= tsOf(41), "C: openedAt terpatri di hari 41 (bukan 12 Des)");
 await fundUsdt(nonReg, E(100));
 await approveMax(nonReg, await CS.sale.getAddress());
-await expectRevert(CS.sale.connect(nonReg).buy, [1, ZERO], "Prelude registrants only", "C: 48 jam pertama berjalan dari openedAt aktual");
+await expectRevert(CS.sale.connect(nonReg).buy, [1, ZERO], "Prelude registrants only", "C: 24 jam pertama berjalan dari openedAt aktual");
 await CS.sale.connect(regA(0)).buy(1, ZERO, GL);
 eq(Number(await CS.sale.totalSold()), 1, "C: pendaftar bisa membeli segera setelah gerbang tercapai");
 await advanceTo(44);
 await CS.sale.connect(nonReg).buy(1, ZERO, GL);
-eq(Number(await CS.sale.totalSold()), 2, "C: publik bisa membeli setelah 48 jam dari openedAt");
+eq(Number(await CS.sale.totalSold()), 2, "C: publik bisa membeli setelah 24 jam dari openedAt");
 await advanceTo(58);
 await CS.sale.connect(anyone).finalize(GL_BIG);
 ok(await CS.sale.failed(), "C: vonis tetap 30 Des — sale yang tertunda tetap gagal bila tak mencapai 5.000");

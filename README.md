@@ -20,7 +20,7 @@ Edition 1 is **Rhapsody No. 1**.
    1 / 3 / 7 / 14 days earn soulbound badges; completing the full set earns the
    OPUS MAGNUM. A broken streak can be repaired once for 0.1 USDT.
 3. **The Sale — Rhapsody No. 1** — 12–30 Dec 2026. 5,000 Passes, sold in USDT,
-   max 10 per wallet. The first 48 hours are reserved for Prelude registrants.
+   max 10 per wallet. The first 24 hours are reserved for Prelude registrants.
 4. **Verdict & Claims** — A single verdict moment: **30 Dec 2026, 12:00 UTC.**
    If all 5,000 Passes sold, the liquidity pool opens and burn-to-claim begins.
    If not, every buyer is refunded **100%** (refund window 30 Dec 2026 –

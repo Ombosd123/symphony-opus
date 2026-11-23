@@ -19,7 +19,7 @@ interface IAgentIdRegistrySale {
     function balanceOf(address owner) external view returns (uint256);
 }
 
-/// @notice Interface PreludeRegistry (gerbang 500 + jendela 48 jam).
+/// @notice Interface PreludeRegistry (gerbang 500 + jendela 24 jam).
 interface IPreludeForSale {
     function count() external view returns (uint256);
     function isRegistered(address user) external view returns (bool);
@@ -105,9 +105,9 @@ interface IPancakePair {
 ///           pertama yang sah menandai openedAt pada momen kedua
 ///           syarat pertama kali sama-sama terpenuhi (openSale() bisa
 ///           dipanggil siapa pun untuk menandainya tepat waktu), dan
-///           jendela 48 jam khusus Prelude berjalan dari openedAt.
+///           jendela 24 jam khusus Prelude berjalan dari openedAt.
 ///           Vonis tetap 30 Des berapa pun openedAt-nya.
-///         - 48 jam pertama sejak openedAt: hanya pendaftar Prelude.
+///         - 24 jam pertama sejak openedAt: hanya pendaftar Prelude.
 ///           Setelahnya: semua pemegang Agent ID. Gate Agent ID berlaku
 ///           untuk SEMUA pembelian primer (pintu masuk, SPEC 9).
 ///         - Referral: pembeli boleh menamai referrer yang SUDAH
@@ -170,7 +170,7 @@ contract SymphonySale {
     uint256 public constant TOTAL_PASSES = 5_000;
     uint256 public constant MAX_PER_WALLET = 10;
     uint256 public constant MIN_REGISTRANTS = 500;
-    uint256 public constant PRELUDE_WINDOW = 48 hours;
+    uint256 public constant PRELUDE_WINDOW = 24 hours;
     uint256 public constant REFERRAL_REWARD = 5_000 ether;
     uint256 public constant REFERRAL_ALLOC = 25_000_000 ether;
     uint256 public constant REFERRAL_POOL_CAP = 15_000_000 ether;
