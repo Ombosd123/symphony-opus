@@ -155,6 +155,16 @@ h2::after {
 table { box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25); }
 th { background: linear-gradient(180deg, #16235a, var(--card)); }
 .bar > div { background: linear-gradient(90deg, #a37f1d, var(--gold), var(--gold2)); }
+/* Score chart (appears once registration #501 lands) */
+#scoreChart { margin-top: 22px; }
+.score-staff { position: relative; height: 190px; margin-top: 10px; }
+.score-line { position: absolute; left: 0; right: 0; height: 1px; background: var(--line); }
+.score-note { position: absolute; width: 12px; height: 9px; border-radius: 50%; background: var(--gold); transform: translateX(-50%); }
+.score-note.peak { width: 16px; height: 12px; background: var(--gold2); box-shadow: 0 0 14px var(--gold); }
+.score-tag { position: absolute; transform: translateX(-50%); font-size: 10px; letter-spacing: 1px; color: var(--gold2); white-space: nowrap; }
+.score-labels { display: flex; border-top: 1px solid var(--line); padding-top: 8px; }
+.score-labels > div { flex: 1; text-align: center; font-size: 11px; color: var(--muted); min-width: 0; }
+.score-labels > div strong { color: var(--text); }
 .badges img { box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), 0 0 0 4px rgba(212, 175, 55, 0.10); }
 .tiers img {
   border-color: rgba(212, 175, 55, 0.4);

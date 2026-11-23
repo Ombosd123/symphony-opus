@@ -62,6 +62,61 @@ document.addEventListener("symphony-lang-changed", () => {
   else updateRefNote(false);
 });
 
+// ---------- score chart (registrations beyond the 500 gate) ----------
+// The chart exists only once registration #501 has landed: below
+// that, the section stays hidden. Daily buckets come from
+// score-data.json, a static file rebuilt from Registered events by
+// an off-site job; counting starts at registration #501, each day is
+// one note (height = that day's joins, scaled to the biggest day),
+// and the only number printed per day is the running total (#cum).
+const SCORE_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+async function renderScoreChart(n) {
+  const wrap = $("scoreChart");
+  if (!wrap) return;
+  if (n < CFG.PRELUDE_GATE + 1) { wrap.hidden = true; return; }
+  try {
+    const res = await fetch("score-data.json", { cache: "no-store" });
+    if (!res.ok) { wrap.hidden = true; return; }
+    const data = await res.json();
+    const days = (data.days || []).filter((d) => d.cum >= CFG.PRELUDE_GATE + 1 && d.joins > 0);
+    if (!days.length) { wrap.hidden = true; return; }
+    const max = Math.max(...days.map((d) => d.joins), 1);
+    const staff = $("scoreStaff");
+    const labels = $("scoreLabels");
+    if (!staff || !labels) { wrap.hidden = true; return; }
+    staff.querySelectorAll(".score-note, .score-tag").forEach((e) => e.remove());
+    labels.innerHTML = "";
+    let peakTagged = false;
+    days.forEach((d, i) => {
+      const x = ((i + 0.5) / days.length) * 100;
+      const isPeak = d.joins === max;
+      const note = document.createElement("div");
+      note.className = "score-note" + (isPeak ? " peak" : "");
+      note.style.left = x + "%";
+      note.style.bottom = (8 + (d.joins / max) * 76) + "%";
+      staff.appendChild(note);
+      if (isPeak && !peakTagged) {
+        peakTagged = true;
+        const tag = document.createElement("div");
+        tag.className = "score-tag";
+        tag.textContent = T("score_peak");
+        tag.style.left = x + "%";
+        tag.style.bottom = (8 + (d.joins / max) * 76 + 9) + "%";
+        staff.appendChild(tag);
+      }
+      const cell = document.createElement("div");
+      const parts = String(d.d).split("-");
+      const label = parts.length === 3 ? Number(parts[2]) + " " + SCORE_MONTHS[Number(parts[1]) - 1] : String(d.d);
+      cell.innerHTML = label + "<br><strong>#" + d.cum + "</strong>";
+      labels.appendChild(cell);
+    });
+    setText("scoreLatest", T("score_latest", { n: days[days.length - 1].cum }));
+    wrap.hidden = false;
+  } catch (e) {
+    wrap.hidden = true;
+  }
+}
+
 // ---------- public reads (no wallet) ----------
 async function refreshPublic() {
   if (!deployed(CFG.PRELUDE_ADDRESS) || typeof ethers === "undefined") return;
@@ -79,6 +134,7 @@ async function refreshPublic() {
     setText("gateNote", n >= CFG.PRELUDE_GATE
       ? T("gate_reached")
       : T("gate_remaining", { n: CFG.PRELUDE_GATE - n }));
+    renderScoreChart(n);
     // Your Melody: newest registrants = highest tokenIds (issued in
     // registration order). Passes are soulbound, so ownerOf(tokenId)
     // is the registrant; burned passes revert and are skipped. With

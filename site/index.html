@@ -111,6 +111,19 @@
     <p><span data-i18n="pre_count_label">Registrations so far:</span> <strong id="preludeCount">—</strong> <span data-i18n="pre_count_suffix">· the sale opens at a minimum of 500 — no maximum</span></p>
     <div class="bar"><div id="gateBar"></div></div>
     <p class="small muted" id="gateNote"></p>
+    <div id="scoreChart" hidden>
+      <h3 data-i18n="score_title">The Score So Far</h3>
+      <p class="small muted" data-i18n="score_sub">Every day is a note — the higher the note, the more voices joined that day.</p>
+      <div class="score-staff" id="scoreStaff">
+        <div class="score-line" style="top:6%"></div>
+        <div class="score-line" style="top:27%"></div>
+        <div class="score-line" style="top:48%"></div>
+        <div class="score-line" style="top:69%"></div>
+        <div class="score-line" style="top:90%"></div>
+      </div>
+      <div class="score-labels" id="scoreLabels"></div>
+      <p class="small muted"><span id="scoreLatest"></span></p>
+    </div>
     <p class="status" id="myPrelude"></p>
     <button id="registerBtn" data-i18n="pre_btn">Register for Prelude</button>
     <p class="small muted" data-i18n="pre_close">Registration closes 12 Dec 2026, 12:00 UTC — the moment the sale opens.</p>
