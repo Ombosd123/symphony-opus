@@ -33,11 +33,11 @@ Edition 1 is **Rhapsody No. 1**.
 | Passes | 5,000 (max 10 per wallet) |
 | Tier 1 — Overture (Pass 1–1,500) | 1 USDT → 78,000 OPUS |
 | Tier 2 — Crescendo (Pass 1,501–3,500) | 1.5 USDT → 65,000 OPUS |
-| Tier 3 — Finale (Pass 3,501–5,000) | 2 USDT → 52,000 OPUS |
+| Tier 3 — Finale (Pass 3,501–5,000) | 2 USDT → 57,000 OPUS |
 | Full raise | 7,500 USDT |
 | Split | 90% liquidity pool / 10% treasury (TreasuryVault) |
 | Token supply | 600,000,000 OPUS (plain ERC-20, no transfer tax) |
-| Pool at graduation | 175,000,000 OPUS + 6,750 USDT on PancakeSwap V2, LP burned |
+| Pool at graduation | 167,500,000 OPUS + 6,750 USDT on PancakeSwap V2, LP burned |
 
 Claims are burn-to-claim, one NFT per transaction. Pass holders choose
 **Premiere** (100% immediately) or **Encore** (50% immediately + 50% vested

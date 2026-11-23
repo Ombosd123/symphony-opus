@@ -84,9 +84,9 @@ interface IPancakePair {
 ///         - Escrow USDT. 5.000 Pass, maks 10 pembelian primer/wallet.
 ///           Tier dari URUTAN penjualan (totalSold): 1–1.500 Overture
 ///           1 USDT → 78.000 OPUS; 1.501–3.500 Crescendo 1,5 USDT →
-///           65.000; 3.501–5.000 Finale 2 USDT → 52.000. Raise penuh
-///           7.500 USDT; alokasi peserta 325 jt dipegang kontrak ini
-///           (bersama pool 175 jt + referral 25 jt + Encore 5 jt yang
+///           65.000; 3.501–5.000 Finale 2 USDT → 57.000. Raise penuh
+///           7.500 USDT; alokasi peserta 332,5 jt dipegang kontrak ini
+///           (bersama pool 167,5 jt + referral 25 jt + Encore 5 jt yang
 ///           dicetak OpusToken ke sini).
 ///         - Buka: timestamp ≥ SALE_START (produksi 1797076800 =
 ///           12 Des 2026 12:00 UTC) DAN PreludeRegistry.count() ≥ 500.
@@ -116,7 +116,7 @@ interface IPancakePair {
 ///           totalSold == 5.000 → LULUS: sapu hasil presale (90% pool /
 ///           10% vault, oleh OpusPresale.sweepProceeds) + sapu bagian
 ///           pool perbaikan Soundcheck ke kontrak ini, 750 USDT (10%)
-///           ke TreasuryVault, tanam pool PancakeSwap V2 (175 jt OPUS
+///           ke TreasuryVault, tanam pool PancakeSwap V2 (167,5 jt OPUS
 ///           + 6.750 USDT + 90% presale + sapuan Soundcheck), LP
 ///           DIBAKAR ke alamat mati, bakar sisa referral, panggil
 ///           Soundcheck.markGraduated. totalSold < 5.000 → GAGAL:
@@ -158,7 +158,7 @@ contract SymphonySale {
     uint256 public constant PRELUDE_WINDOW = 48 hours;
     uint256 public constant REFERRAL_REWARD = 5_000 ether;
     uint256 public constant REFERRAL_ALLOC = 25_000_000 ether;
-    uint256 public constant POOL_OPUS = 175_000_000 ether;
+    uint256 public constant POOL_OPUS = 167_500_000 ether;
     uint256 public constant POOL_USDT = 6_750 ether;
     uint256 public constant TREASURY_USDT = 750 ether;
     uint256 public constant ENCORE_POOL = 5_000_000 ether;
@@ -331,14 +331,14 @@ contract SymphonySale {
         require(position >= 1 && position <= TOTAL_PASSES, "SymphonySale: bad position");
         if (position <= 1_500) return (1, 1 ether, 78_000 ether);
         if (position <= 3_500) return (2, 1.5 ether, 65_000 ether);
-        return (3, 2 ether, 52_000 ether);
+        return (3, 2 ether, 57_000 ether);
     }
 
     /// @notice Hak klaim OPUS menurut nomor tier.
     function claimOfTier(uint8 tier) public pure returns (uint256) {
         if (tier == 1) return 78_000 ether;
         if (tier == 2) return 65_000 ether;
-        if (tier == 3) return 52_000 ether;
+        if (tier == 3) return 57_000 ether;
         return 0;
     }
 

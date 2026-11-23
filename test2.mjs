@@ -491,7 +491,7 @@ ok(await A.sale.graduated(), "A: sale LULUS di vonis");
 const pairAddr = await A.factory.getPair(await A.opus.getAddress(), usdtAddr);
 ok(pairAddr !== ZERO, "A: pair PancakeSwap tercipta");
 const pair = new ethers.Contract(pairAddr, C.MockPair.abi, provider);
-eq(await pair.reserve0(), E(175_000_000), "A: pool berisi 175 jt OPUS");
+eq(await pair.reserve0(), E(167_500_000), "A: pool berisi 167,5 jt OPUS");
 eq(await pair.reserve1(), E("6804.05"), "A: pool USDT = 6.750 + 54 presale + 0,05 Soundcheck");
 eq(await pair.balanceOf(await A.sale.getAddress()), 0n, "A: LP tidak tertinggal di sale");
 ok((await pair.balanceOf(DEAD)) > 0n, "A: LP DIBAKAR ke alamat mati");

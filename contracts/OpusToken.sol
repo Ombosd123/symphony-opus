@@ -7,7 +7,7 @@ pragma solidity ^0.8.24;
 ///           2026-11-22), tanpa fungsi owner, tanpa pause,
 ///           tanpa mint ulang — 600 jt dicetak SEKALI di konstruktor ke
 ///           alamat-alamat alokasi:
-///             SymphonySale   530 jt = peserta 325 jt + pool 175 jt
+///             SymphonySale   530 jt = peserta 332,5 jt + pool 167,5 jt
 ///                            + referral sale 25 jt + kolam Encore 5 jt
 ///             Distributor    50 jt = komunitas (Soundcheck 30 jt +
 ///                            bonus Prelude rata 15 jt + referral
