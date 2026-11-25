@@ -632,7 +632,7 @@ id: {
   sc_title: "Soundcheck — hadir setiap hari",
   sc_text: "Check-in gratis, sekali sehari (UTC), dengan Agent ID apa pun. Jaga streak tetap hidup dan badge diterbitkan otomatis kepadamu. Lengkapi set penuh 14 hari dan kamu juga menerima OPUS MAGNUM — instrumen klaimmu atas bagian pro-rata kolam Soundcheck 30.000.000 OPUS (batas atas 60.000 OPUS per orang), dibayarkan bila sale lulus.",
   b1_desc: "Hari ke-1 — FIRST NOTE", b2_desc: "Hari ke-3 — TUNING", b3_desc: "Hari ke-7 — REHEARSAL", b4_desc: "Hari ke-14 — FULL SCORE", b5_desc: "Set lengkap — OPUS MAGNUM",
-  sc_btn_checkin: "Check-in hari ini", sc_btn_repair: "Perbaiki satu hari bolong (0,1 USDT)",
+  sc_btn_checkin: "Check-in hari ini", sc_btn_repair: "Perbaiki satu hari yang putus (0,1 USDT)",
   sc_repair_note: "Bolong tepat satu hari? Perbaikan berharga 0,1 USDT: 0,05 USDT masuk ke treasury (bagian ini tidak dikembalikan, bahkan bila sale gagal) dan 0,05 USDT ditahan sebagai bagian pool, tercatat atas alamatmu — ia ikut masuk pool bila sale lulus, atau bisa kamu klaim kembali selama jendela refund bila sale gagal. Bolong lebih dari satu hari tidak bisa diperbaiki; streak dimulai ulang.",
   ps_title: "Presale — OPUS langsung",
   ps_text: "Di samping sale Pass ada presale langsung kecil sebesar 5.000.000 OPUS seharga $0,0001 per OPUS — secara terbuka jalan masuk yang paling mahal, dihargai sebagai jangkar agar tier Pass berbicara sendiri. Ia hanya buka setelah Tier 1 (Overture) habis, dibatasi 50 USDT per wallet, dan hasilnya dibagi 90/10 persis seperti sale utama. Tidak ada apa pun yang dijual sebelum 12 Des 2026, 12:00 UTC.",
