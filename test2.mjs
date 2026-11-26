@@ -23,6 +23,10 @@
 //       akru referral berhenti tepat di 15 jt, bakar finalize = 0,
 //       bonus badge +5.000 di Premiere & Encore, cap 10 Pass/wallet
 //       (Pass ke-11 dari market tanpa bonus).
+//   VERS — token pendamping tanpa nilai (SPEC 25, 2026-11-27):
+//       terbit 10 per USDT di dalam buy() (A: 100 per pembeli T1,
+//       total tepat 70.000 saat habis terjual; bebas transfer tanpa
+//       pajak; B: tetap di tangan pembeli setelah refund).
 // Jalankan: node test2.mjs
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -51,6 +55,7 @@ function compileAll() {
     "OpusDistributor.sol": join(root, "contracts", "OpusDistributor.sol"),
     "OpusPresale.sol": join(root, "contracts", "OpusPresale.sol"),
     "ScherzoKey.sol": join(root, "contracts", "ScherzoKey.sol"),
+    "VersToken.sol": join(root, "contracts", "VersToken.sol"),
     "MockAgentId.sol": join(root, "mocks", "MockAgentId.sol"),
     "MockUSDT.sol": join(root, "mocks", "MockUSDT.sol"),
     "MockPancake.sol": join(root, "mocks", "MockPancake.sol"),
@@ -87,6 +92,7 @@ function compileAll() {
     OpusDistributor: get("OpusDistributor.sol", "OpusDistributor"),
     OpusPresale: get("OpusPresale.sol", "OpusPresale"),
     ScherzoKey: get("ScherzoKey.sol", "ScherzoKey"),
+    VersToken: get("VersToken.sol", "VersToken"),
     MockAgentId: get("MockAgentId.sol", "MockAgentId"),
     MockUSDT: get("MockUSDT.sol", "MockUSDT"),
     MockFactory: get("MockPancake.sol", "MockFactory"),
@@ -256,6 +262,7 @@ async function deployStack({ regEnd, saleStart, verdict }) {
     await prelude.getAddress(), await sc.getAddress(), await sale.getAddress()
   );
   const scherzoKey = await deploy(C.ScherzoKey, deployer);
+  const vers = await deploy(C.VersToken, deployer);
   const badgeReg = await deploy(C.MockAgentId, deployer);
   const opus = await deploy(
     C.OpusToken, deployer,
@@ -276,7 +283,9 @@ async function deployStack({ regEnd, saleStart, verdict }) {
   await scherzoKey.bindSale(saleAddr, GL);
   await sale.bindScherzoKey(await scherzoKey.getAddress(), GL);
   await sale.bindBadgeRegistry(await badgeReg.getAddress(), GL);
-  return { vault, prelude, sc, pass, factory, router, sale, market, vesting, presale, distributor, opus, scherzoKey, badgeReg };
+  await vers.bindSale(saleAddr, GL);
+  await sale.bindVers(await vers.getAddress(), GL);
+  return { vault, prelude, sc, pass, factory, router, sale, market, vesting, presale, distributor, opus, scherzoKey, badgeReg, vers };
 }
 
 // ======================================================================
@@ -315,6 +324,13 @@ await expectRevert(A.scherzoKey.connect(anyone).mintKey, [addrs[7]], "only the s
 await expectRevert(A.scherzoKey.bindSale, [addrs[7]], "sale already bound", "A: bindSale di kontrak kunci hanya sekali");
 await expectRevert(A.sale.bindScherzoKey, [addrs[7]], "key already bound", "A: bindScherzoKey di sale hanya sekali");
 await expectRevert(A.sale.bindBadgeRegistry, [addrs[7]], "badge already bound", "A: bindBadgeRegistry hanya sekali");
+// Token pendamping VERS (SPEC 25): identitas, pasokan awal nol,
+// mint hanya oleh kontrak sale, bindVers satu-kali.
+eq(await A.vers.name(), "Vers", "A: nama token pendamping");
+eq(await A.vers.symbol(), "VERS", "A: simbol token pendamping VERS");
+eq(Number(await A.vers.totalSupply()), 0, "A: VERS belum terbit sebelum ada pembelian");
+await expectRevert(A.vers.connect(anyone).mint, [addrs[7], E(1)], "only the sale mints", "A: mint VERS oleh non-sale revert");
+await expectRevert(A.sale.bindVers, [addrs[7]], "vers already bound", "A: bindVers hanya sekali");
 eq((await A.sale.REFERRAL_POOL_CAP()) + (await A.sale.BADGE_POOL_CAP()), await A.sale.REFERRAL_ALLOC(), "A: pagar referral 15 jt + kolam badge 10 jt = alokasi 25 jt");
 await expectRevert(A.scherzoKey.tokenURI, [1], "nonexistent token", "A: tokenURI kunci yang belum terbit revert");
 
@@ -378,6 +394,8 @@ ok(Number(await A.sale.openedAt()) > 0, "A: openedAt terpatri pada pembelian per
 const idsReg2 = await buyA(comp2, 10, addrs[11]); // referrer = reg1
 eq(await A.sale.referralAccrued(addrs[11]), E(50_000), "A: referral terakru 10 × 5.000 untuk reg1");
 eq(idsReg1.length, 10, "A: reg1 menerima 10 Pass");
+eq(await A.vers.balanceOf(addrs[11]), E(100), "A: pembeli pertama menerima 100 VERS (10 Pass T1 = 10 USDT x 10)");
+eq(await A.vers.balanceOf(addrs[12]), E(100), "A: pembeli kedua menerima 100 VERS");
 await expectRevert(A.sale.connect(regA(3)).buy, [1, addrs[13]], "self-referral", "A: self-referral revert");
 await expectRevert(A.sale.connect(regA(4)).buy, [1, addrs[5]], "referrer holds no Pass", "A: referrer tanpa Pass revert");
 const idsReg0 = await buyA(regA(0), 10);
@@ -387,6 +405,10 @@ const idsReg7 = await buyA(regA(7), 10);
 eq(Number(await A.sale.totalSold()), 60, "A: totalSold 60");
 const idsBadgeA = await buyA(signers[580], 10);
 eq(Number(await A.sale.totalSold()), 70, "A: totalSold 70 setelah pembeli badge");
+// VERS bebas ditransfer, utuh tanpa pajak (SPEC 25).
+await A.vers.connect(comp1).transfer(addrs[13], E(5), GL);
+eq(await A.vers.balanceOf(addrs[11]), E(95), "A: VERS terkirim utuh tanpa pajak (pengirim tersisa 95)");
+eq(await A.vers.balanceOf(addrs[13]), E(5), "A: VERS terkirim utuh tanpa pajak (penerima 5)");
 
 // Hari 41–42: check-in berlanjut; jendela Prelude 24 jam sudah
 // lewat di hari ke-41 (openedAt hari 40 + 24 jam) — publik terbuka.
@@ -457,6 +479,7 @@ await expectRevert(A.market.connect(regA(5)).listPass, [passReg5, E("0.8")], "ma
 // Penjualan dilengkapi sampai habis (hari 43); market membuka.
 await bulkToA(5000);
 eq(Number(await A.pass.totalMinted()), 5000, "A: 5.000 Pass tercetak");
+eq(await A.vers.totalSupply(), E(70_000), "A: total VERS terbit tepat 70.000 saat habis terjual (7.000 USDT x 10)");
 ok(await A.market.isOpen(), "A: market TERBUKA tepat saat sale habis terjual");
 await fundUsdt(signers[9], E(100));
 await approveMax(signers[9], await A.sale.getAddress());
@@ -480,6 +503,12 @@ await A.market.connect(marketBuyer).buy(1, GL);
 eq(await usdt.balanceOf(addrs[15]), sellerBefore + E("0.76"), "A: penjual menerima 95% (0,76)");
 eq(await usdt.balanceOf(await A.vault.getAddress()), vaultBefore + E("0.04"), "A: fee market 5% (0,04) ke TreasuryVault");
 eq(await A.pass.ownerOf(passReg5), addrs[4], "A: Pass berpindah ke pembeli market");
+// VERS TIDAK ikut berpindah bersama Pass lewat market (SPEC 25):
+// penjual mempertahankan seluruh VERS-nya, pembeli market tidak
+// menerima VERS apa pun — VERS hanya bergerak lewat transfer sadar
+// oleh pemegangnya sendiri.
+eq(await A.vers.balanceOf(addrs[15]), E(100), "A: VERS penjual utuh setelah Pass-nya terjual di market (tidak ikut pindah)");
+eq(await A.vers.balanceOf(addrs[4]), E(0), "A: pembeli market tidak menerima VERS (VERS hanya terbit dari pembelian primer)");
 const passReg6 = idsReg6[0];
 const listTx2 = await A.market.connect(regA(6)).listPass(passReg6, E(1), GL);
 await listTx2.wait();
@@ -766,6 +795,7 @@ const usdtB2Before = await usdt.balanceOf(addrs[602]);
 eq(await B.pass.ownerOf(21), addrs[602], "B: Pass #21 milik regsB[2]");
 await B.sale.connect(regsB[2]).refund(21, GL);
 eq((await usdt.balanceOf(addrs[602])) - usdtB2Before, E(1), "B: refund membayar penuh 1 USDT (Tier 1)");
+eq(await B.vers.balanceOf(addrs[602]), E(100), "B: VERS tetap di tangan pembeli setelah refund (suvenir — tidak ditarik kembali)");
 await expectRevert(B.pass.ownerOf, [21], "nonexistent token", "B: Pass refund ter-burn");
 // Market tidak pernah buka: beli revert; Pass tetap di penjual lalu refund
 await expectRevert(B.market.connect(marketBuyer).buy, [1], "market closed", "B: market tetap tertutup setelah vonis gagal");

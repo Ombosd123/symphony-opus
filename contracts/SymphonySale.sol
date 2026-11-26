@@ -59,6 +59,14 @@ interface IBadgeForSale {
     function balanceOf(address owner) external view returns (uint256);
 }
 
+/// @notice Interface VersToken (token pendamping VERS — SPEC 25):
+///         dicetak untuk pembeli di dalam buy(), 10 VERS per USDT
+///         yang dibayar. Tanpa nilai, tanpa pool; konversi 1:1 ke
+///         VERT hanya bila Scherzo dibuka.
+interface IVersForSale {
+    function mint(address to, uint256 amount) external;
+}
+
 /// @notice PancakeSwap V2 (produksi BSC: factory
 ///         0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73, router
 ///         0x10ED43C718714eb63d5aA57B78B54704E256024E).
@@ -208,6 +216,7 @@ contract SymphonySale {
     IPresaleForSale public presale;
     IScherzoKeyForSale public scherzoKey;
     IBadgeForSale public badgeRegistry;
+    IVersForSale public vers;
 
     // ------------------------------------------------------------------
     // State sale
@@ -259,6 +268,7 @@ contract SymphonySale {
     event PresaleBound(address indexed presale);
     event ScherzoKeyBound(address indexed key);
     event BadgeRegistryBound(address indexed badge);
+    event VersBound(address indexed vers);
     event SaleOpened(uint256 openedAt);
     event PassBought(address indexed buyer, uint256 count, uint256 totalPaid, address referrer);
     event Graduated(uint256 poolUsdt, uint256 presaleToPool, uint256 soundcheckSwept, uint256 referralBurned);
@@ -339,6 +349,14 @@ contract SymphonySale {
         require(badge_ != address(0), "SymphonySale: badge zero address");
         badgeRegistry = IBadgeForSale(badge_);
         emit BadgeRegistryBound(badge_);
+    }
+
+    function bindVers(address vers_) external {
+        require(msg.sender == deployer, "SymphonySale: not the deployer");
+        require(address(vers) == address(0), "SymphonySale: vers already bound");
+        require(vers_ != address(0), "SymphonySale: vers zero address");
+        vers = IVersForSale(vers_);
+        emit VersBound(vers_);
     }
 
     // ------------------------------------------------------------------
@@ -444,6 +462,12 @@ contract SymphonySale {
                 referralAccrued[referrer] += accrued;
                 totalReferralAccrued += accrued;
             }
+        }
+        // Token pendamping VERS (SPEC 25): 10 VERS per USDT yang
+        // dibayar, dicetak langsung untuk pembeli. Fail-soft bila
+        // belum terikat — pola yang sama dengan bonus badge.
+        if (address(vers) != address(0)) {
+            vers.mint(msg.sender, totalPrice * 10);
         }
         emit PassBought(msg.sender, count, totalPrice, referrer);
     }

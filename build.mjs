@@ -23,6 +23,7 @@ const FILES = [
   "OpusDistributor.sol",
   "OpusPresale.sol",
   "ScherzoKey.sol",
+  "VersToken.sol",
 ];
 const WANT = [
   "PreludeRegistry",
@@ -36,6 +37,7 @@ const WANT = [
   "OpusDistributor",
   "OpusPresale",
   "ScherzoKey",
+  "VersToken",
 ];
 
 const sources = {};
