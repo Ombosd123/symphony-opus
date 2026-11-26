@@ -194,8 +194,28 @@
   </section>
 
   <section id="market">
-    <h2><span data-i18n="mk_title">Market</span> <span class="soon" data-i18n="mk_soon">Coming Soon</span></h2>
+    <h2><span data-i18n="mk_title">Market</span> <span class="soon" id="mkSoon" data-i18n="mk_soon">Coming Soon</span></h2>
     <p data-i18n="mk_text">The official SYMPHONY market is the only way a Pass can change hands. Passes are semi-soulbound — free transfers are not possible, and a Pass cannot be listed on third-party marketplaces. The market opens only once the sale has sold out — all 5,000 Passes — and stays open until the verdict on 30 Dec 2026, 12:00 UTC, when it closes. If the sale does not sell out, the market never opens.</p>
+    <div id="mkBanner" class="mk-banner" hidden>
+      <strong id="mkBannerTitle"></strong>
+      <span id="mkBannerNote"></span>
+    </div>
+    <div id="mkApp" hidden>
+      <div class="mk-controls">
+        <div class="mk-dd">
+          <button id="mkTierBtn" type="button" class="mk-dd-btn"></button>
+          <div id="mkTierMenu" class="mk-menu" hidden></div>
+        </div>
+        <div class="mk-dd">
+          <button id="mkSortBtn" type="button" class="mk-dd-btn"></button>
+          <div id="mkSortMenu" class="mk-menu" hidden></div>
+        </div>
+      </div>
+      <p id="mkCount" class="small muted"></p>
+      <div id="mkGrid" class="mk-grid"></div>
+      <button id="mkMore" type="button" class="mk-more" hidden></button>
+      <p id="mkStatus" class="status"></p>
+    </div>
     <ul>
       <li data-i18n="mk_r1">Only Passes that have not been claimed can be traded. Payment is in USDT.</li>
       <li data-i18n="mk_r2">Buyers must hold a Binance Agent ID.</li>
@@ -272,6 +292,7 @@
 <script src="i18n.js"></script>
 <script src="melody.js"></script>
 <script src="app.js"></script>
+<script src="market.js"></script>
 <script src="intro.js"></script>
 </body>
 </html>
