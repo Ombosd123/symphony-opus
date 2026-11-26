@@ -89,10 +89,10 @@ interface IPancakePair {
 /// @notice SPEC-SYMPHONY.md bagian 2, 5, 6, 9 & 10 (fase 2):
 ///         - Escrow USDT. 5.000 Pass, maks 10 pembelian primer/wallet.
 ///           Tier dari URUTAN penjualan (totalSold): 1–1.500 Overture
-///           1 USDT → 78.000 OPUS; 1.501–3.500 Crescendo 1,5 USDT →
-///           65.000; 3.501–5.000 Finale 2 USDT → 57.000. Raise penuh
-///           7.500 USDT; alokasi peserta 332,5 jt dipegang kontrak ini
-///           (bersama pool 167,5 jt + referral 25 jt + Encore 5 jt yang
+///           1 USDT → 78.000 OPUS; 1.501–4.500 Crescendo 1,5 USDT →
+///           65.000; 4.501–5.000 Finale 2 USDT → 57.000. Raise penuh
+///           7.000 USDT; alokasi peserta 340,5 jt dipegang kontrak ini
+///           (bersama pool 159,5 jt + referral 25 jt + Encore 5 jt yang
 ///           dicetak OpusToken ke sini).
 ///         - Buka: timestamp ≥ SALE_START (produksi 1797076800 =
 ///           12 Des 2026 12:00 UTC) DAN PreludeRegistry.count() ≥ 500.
@@ -130,9 +130,9 @@ interface IPancakePair {
 ///           30 Des 2026 12:00 UTC): finalize() permissionless —
 ///           totalSold == 5.000 → LULUS: sapu hasil presale (90% pool /
 ///           10% vault, oleh OpusPresale.sweepProceeds) + sapu bagian
-///           pool perbaikan Soundcheck ke kontrak ini, 750 USDT (10%)
-///           ke TreasuryVault, tanam pool PancakeSwap V2 (167,5 jt OPUS
-///           + 6.750 USDT + 90% presale + sapuan Soundcheck), LP
+///           pool perbaikan Soundcheck ke kontrak ini, 700 USDT (10%)
+///           ke TreasuryVault, tanam pool PancakeSwap V2 (159,5 jt OPUS
+///           + 6.300 USDT + 90% presale + sapuan Soundcheck), LP
 ///           DIBAKAR ke alamat mati, bakar sisa referral, panggil
 ///           Soundcheck.markGraduated. totalSold < 5.000 → GAGAL:
 ///           Soundcheck.markFailed; refund burn-to-settle sebesar
@@ -177,9 +177,9 @@ contract SymphonySale {
     uint256 public constant BADGE_POOL_CAP = 10_000_000 ether;
     uint256 public constant BADGE_BONUS = 5_000 ether;
     uint256 public constant BADGE_MAX_PASSES = 10;
-    uint256 public constant POOL_OPUS = 167_500_000 ether;
-    uint256 public constant POOL_USDT = 6_750 ether;
-    uint256 public constant TREASURY_USDT = 750 ether;
+    uint256 public constant POOL_OPUS = 159_500_000 ether;
+    uint256 public constant POOL_USDT = 6_300 ether;
+    uint256 public constant TREASURY_USDT = 700 ether;
     uint256 public constant ENCORE_POOL = 5_000_000 ether;
     uint256 public constant ENCORE_VEST_SECONDS = 60 days;
     uint256 public constant CLAIM_WINDOW = 30 days;
@@ -364,7 +364,7 @@ contract SymphonySale {
     function tierFor(uint256 position) public pure returns (uint8 tier, uint256 price, uint256 claim) {
         require(position >= 1 && position <= TOTAL_PASSES, "SymphonySale: bad position");
         if (position <= 1_500) return (1, 1 ether, 78_000 ether);
-        if (position <= 3_500) return (2, 1.5 ether, 65_000 ether);
+        if (position <= 4_500) return (2, 1.5 ether, 65_000 ether);
         return (3, 2 ether, 57_000 ether);
     }
 

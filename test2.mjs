@@ -438,13 +438,13 @@ await A.presale.connect(presaleBuyer2).buy(E(10), GL);
 eq(await A.presale.totalRaised(), E(60), "A: presale totalRaised 60 USDT");
 await expectRevert(A.presale.connect(noAgent).buy, [E(1)], "not an Agent ID holder", "A: presale tanpa Agent ID revert");
 
-await bulkToA(3500);
+await bulkToA(4500);
 eq(Number(await A.pass.tierOf(1501)), 2, "A: Pass #1501 = Tier 2");
 eq(await A.pass.paidOf(1501), E("1.5"), "A: Pass #1501 paidOf 1,5 USDT");
-eq(Number(await A.pass.tierOf(3500)), 2, "A: Pass #3500 = Tier 2");
-await bulkToA(3501);
-eq(Number(await A.pass.tierOf(3501)), 3, "A: Pass #3501 = Tier 3");
-eq(await A.pass.paidOf(3501), E(2), "A: Pass #3501 paidOf 2 USDT");
+eq(Number(await A.pass.tierOf(4500)), 2, "A: Pass #4500 = Tier 2");
+await bulkToA(4501);
+eq(Number(await A.pass.tierOf(4501)), 3, "A: Pass #4501 = Tier 3");
+eq(await A.pass.paidOf(4501), E(2), "A: Pass #4501 paidOf 2 USDT");
 
 // ---------- market (hari 43, masa sale) ----------
 console.log("— Skenario A: market —");
@@ -504,11 +504,11 @@ ok(await A.sale.graduated(), "A: sale LULUS di vonis");
 const pairAddr = await A.factory.getPair(await A.opus.getAddress(), usdtAddr);
 ok(pairAddr !== ZERO, "A: pair PancakeSwap tercipta");
 const pair = new ethers.Contract(pairAddr, C.MockPair.abi, provider);
-eq(await pair.reserve0(), E(167_500_000), "A: pool berisi 167,5 jt OPUS");
-eq(await pair.reserve1(), E("6804.05"), "A: pool USDT = 6.750 + 54 presale + 0,05 Soundcheck");
+eq(await pair.reserve0(), E(159_500_000), "A: pool berisi 159,5 jt OPUS");
+eq(await pair.reserve1(), E("6354.05"), "A: pool USDT = 6.300 + 54 presale + 0,05 Soundcheck");
 eq(await pair.balanceOf(await A.sale.getAddress()), 0n, "A: LP tidak tertinggal di sale");
 ok((await pair.balanceOf(DEAD)) > 0n, "A: LP DIBAKAR ke alamat mati");
-eq(await usdt.balanceOf(await A.vault.getAddress()), E("756.24"), "A: vault = 750 sale + 6 presale + 0,19 fee market + 0,05 repair");
+eq(await usdt.balanceOf(await A.vault.getAddress()), E("706.24"), "A: vault = 700 sale + 6 presale + 0,19 fee market + 0,05 repair");
 eq(Number(await A.sc.outcome()), 1, "A: Soundcheck tertanda Graduated");
 eq(await usdt.balanceOf(await A.sc.getAddress()), 0n, "A: bagian pool Soundcheck tersapu habis");
 eq(await A.opus.totalSupply(), E(585_050_000), "A: bakar finalize 14,95 jt (25 jt − 50 rb referral terakru − 10 jt kolam badge tertahan)");
