@@ -56,6 +56,7 @@ function compileAll() {
     "OpusPresale.sol": join(root, "contracts", "OpusPresale.sol"),
     "ScherzoKey.sol": join(root, "contracts", "ScherzoKey.sol"),
     "VersToken.sol": join(root, "contracts", "VersToken.sol"),
+    "RestToken.sol": join(root, "contracts", "RestToken.sol"),
     "MockAgentId.sol": join(root, "mocks", "MockAgentId.sol"),
     "MockUSDT.sol": join(root, "mocks", "MockUSDT.sol"),
     "MockPancake.sol": join(root, "mocks", "MockPancake.sol"),
@@ -93,6 +94,7 @@ function compileAll() {
     OpusPresale: get("OpusPresale.sol", "OpusPresale"),
     ScherzoKey: get("ScherzoKey.sol", "ScherzoKey"),
     VersToken: get("VersToken.sol", "VersToken"),
+    RestToken: get("RestToken.sol", "RestToken"),
     MockAgentId: get("MockAgentId.sol", "MockAgentId"),
     MockUSDT: get("MockUSDT.sol", "MockUSDT"),
     MockFactory: get("MockPancake.sol", "MockFactory"),
@@ -263,6 +265,7 @@ async function deployStack({ regEnd, saleStart, verdict }) {
   );
   const scherzoKey = await deploy(C.ScherzoKey, deployer);
   const vers = await deploy(C.VersToken, deployer);
+  const rest = await deploy(C.RestToken, deployer);
   const badgeReg = await deploy(C.MockAgentId, deployer);
   const opus = await deploy(
     C.OpusToken, deployer,
@@ -285,7 +288,9 @@ async function deployStack({ regEnd, saleStart, verdict }) {
   await sale.bindBadgeRegistry(await badgeReg.getAddress(), GL);
   await vers.bindSale(saleAddr, GL);
   await sale.bindVers(await vers.getAddress(), GL);
-  return { vault, prelude, sc, pass, factory, router, sale, market, vesting, presale, distributor, opus, scherzoKey, badgeReg, vers };
+  await rest.bindPresale(await presale.getAddress(), GL);
+  await presale.bindRest(await rest.getAddress(), GL);
+  return { vault, prelude, sc, pass, factory, router, sale, market, vesting, presale, distributor, opus, scherzoKey, badgeReg, vers, rest };
 }
 
 // ======================================================================
@@ -454,11 +459,18 @@ await fundUsdt(presaleBuyer1, E(100));
 await approveMax(presaleBuyer1, await A.presale.getAddress());
 await A.presale.connect(presaleBuyer1).buy(E(50), GL);
 eq(await A.presale.opusOwedOf(addrs[2]), E(500_000), "A: presale buyer1 berhak 500.000 OPUS");
+eq(await A.rest.name(), "Rest", "A: nama token tanda terima REST");
+eq(await A.rest.symbol(), "REST", "A: simbol token tanda terima REST");
+eq(await A.rest.balanceOf(addrs[2]), E(500_000), "A: REST buyer1 tercetak 500.000 seketika (1:1 hak OPUS)");
+await expectRevert(A.rest.connect(presaleBuyer1).transfer, [addrs[3], E(1)], "non-transferable", "A: REST tidak bisa dikirim ke dompet lain (soulbound)");
+await expectRevert(A.rest.connect(anyone).mint, [addrs[7], E(1)], "only the presale mints", "A: mint REST oleh non-presale revert");
 await expectRevert(A.presale.connect(presaleBuyer1).buy, [E(1)], "wallet cap exceeded", "A: presale cap 50 USDT/wallet ditegakkan");
 await fundUsdt(presaleBuyer2, E(100));
 await approveMax(presaleBuyer2, await A.presale.getAddress());
 await A.presale.connect(presaleBuyer2).buy(E(10), GL);
 eq(await A.presale.totalRaised(), E(60), "A: presale totalRaised 60 USDT");
+eq(await A.rest.balanceOf(addrs[3]), E(100_000), "A: REST buyer2 tercetak 100.000 seketika");
+eq(Number(await A.presale.buyersCount()), 2, "A: 2 pembeli presale tercatat untuk distribute");
 await expectRevert(A.presale.connect(noAgent).buy, [E(1)], "not an Agent ID holder", "A: presale tanpa Agent ID revert");
 
 await bulkToA(4500);
@@ -553,10 +565,18 @@ eq(await A.opus.totalSupply(), E(585_050_000), "A: bakar finalize 14,95 jt (25 j
 // Presale: selesaikan OPUS tak terjual + klaim pembeli
 await A.presale.connect(anyone).settleUnsold(GL);
 eq(await A.opus.balanceOf(await A.vesting.getAddress()), E(19_400_000), "A: vesting = 15 jt + 4,4 jt presale tak terjual");
-await A.presale.connect(presaleBuyer1).claimOpus(GL);
-eq(await A.opus.balanceOf(addrs[2]), E(500_000), "A: presale buyer1 menerima 500.000 OPUS utuh");
+// Distribusi OTOMATIS (SPEC 26): buyer1 terbayar lewat distribute per kelompok, tanpa tindakan darinya
+await A.presale.connect(anyone).distribute(0, 1, GL);
+eq(await A.opus.balanceOf(addrs[2]), E(500_000), "A: distribute membayar buyer1 500.000 OPUS otomatis");
+eq(await A.rest.balanceOf(addrs[2]), 0n, "A: REST buyer1 terbakar dalam distribusi yang sama");
+eq(await A.presale.opusOwedOf(addrs[2]), 0n, "A: hak buyer1 tercatat lunas");
+// buyer2 memakai jalur cadangan claimOpus
 await A.presale.connect(presaleBuyer2).claimOpus(GL);
 eq(await A.opus.balanceOf(addrs[3]), E(100_000), "A: presale buyer2 menerima 100.000 OPUS");
+eq(await A.rest.balanceOf(addrs[3]), 0n, "A: REST buyer2 terbakar saat klaim cadangan");
+// distribute ulang atas rentang penuh = no-op, tidak ada pembayaran ganda
+await A.presale.connect(anyone).distribute(0, 10, GL);
+eq(await A.opus.balanceOf(addrs[2]), E(500_000), "A: distribute ulang tidak membayar dua kali");
 await expectRevert(A.presale.connect(presaleBuyer1).claimOpus, [], "nothing to claim", "A: klaim presale dua kali revert");
 
 // Klaim sale: referral, Premiere, Encore
@@ -769,6 +789,7 @@ await fundUsdt(presaleBuyerB, E(100));
 await approveMax(presaleBuyerB, await B.presale.getAddress());
 await B.presale.connect(presaleBuyerB).buy(E(20), GL);
 eq(await B.presale.opusOwedOf(addrs[1100]), E(200_000), "B: presale buyerB berhak 200.000 OPUS");
+eq(await B.rest.balanceOf(addrs[1100]), E(200_000), "B: REST buyerB tercetak 200.000 seketika");
 await advanceTo(41);
 await B.sc.connect(regsB[0]).checkIn(GL);
 await advanceTo(43); // hari 42 bolong
@@ -801,10 +822,12 @@ await expectRevert(B.pass.ownerOf, [21], "nonexistent token", "B: Pass refund te
 await expectRevert(B.market.connect(marketBuyer).buy, [1], "market closed", "B: market tetap tertutup setelah vonis gagal");
 eq(await B.pass.ownerOf(idsB1[0]), addrs[601], "B: Pass tak pernah meninggalkan penjual (market tak pernah buka)");
 await B.sale.connect(regsB[1]).refund(idsB1[0], GL);
+await expectRevert(B.presale.connect(anyone).distribute, [0, 1], "proceeds not swept yet", "B: distribute di jalur gagal revert");
 // Presale: refund penuh
 const usdtPBBefore = await usdt.balanceOf(addrs[1100]);
 await B.presale.connect(presaleBuyerB).claimRefund(GL);
 eq((await usdt.balanceOf(addrs[1100])) - usdtPBBefore, E(20), "B: refund presale 100% (20 USDT)");
+eq(await B.rest.balanceOf(addrs[1100]), 0n, "B: REST buyerB hangus pada klaim refund yang sama");
 // OPUS presale tak terjual kembali ke vesting
 await B.presale.connect(anyone).settleUnsold(GL);
 eq(await B.opus.balanceOf(await B.vesting.getAddress()), E(19_800_000), "B: vesting = 15 jt + 4,8 jt presale tak terjual");

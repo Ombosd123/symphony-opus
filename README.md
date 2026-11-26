@@ -78,13 +78,14 @@ compiled with solc 0.8.38, optimizer 200, EVM paris.
 | OpusPresale | 2 | Built and tested — deployment early December 2026 |
 | ScherzoKey | 2 | Built and tested — deployment early December 2026 |
 | VersToken | 2 | Built and tested — deployment early December 2026 |
+| RestToken | 2 | Built and tested — deployment early December 2026 |
 
 ## Repository layout
 
 - `contracts/` — all Solidity sources (phase 1 + phase 2)
 - `site/` — the static website (deployed to Cloudflare Pages)
 - `build.mjs`, `test.mjs`, `test2.mjs`, `sound-test.mjs`, `intro-test.mjs` —
-  local build and test harnesses (313 assertions across the full system)
+  local build and test harnesses (327 assertions across the full system)
 
 ## Links
 

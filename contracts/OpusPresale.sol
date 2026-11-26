@@ -20,6 +20,15 @@ interface ISaleForPresale {
     function failed() external view returns (bool);
 }
 
+/// @notice Interface token tanda terima REST (SPEC 26): dicetak ke
+///         pembeli saat buy (1 REST = 1 OPUS hak presale), dibakar
+///         kontrak ini saat OPUS dibagikan atau refund diklaim.
+interface IRestForPresale {
+    function mint(address to, uint256 amount) external;
+    function burnFrom(address account, uint256 amount) external;
+    function balanceOf(address account) external view returns (uint256);
+}
+
 /// @title OpusPresale — presale $OPUS langsung (tanpa Pass)
 /// @notice SPEC-SYMPHONY.md bagian 5A & 10 (fase 2):
 ///         - 5 jt OPUS dari JATAH TIM dicetak OpusToken ke kontrak ini.
@@ -31,20 +40,26 @@ interface ISaleForPresale {
 ///           dibaca dari konteks sale) atau saat 5 jt habis. Bila Tier 1
 ///           tidak pernah habis, presale tidak pernah buka.
 ///         - Gate Agent ID di pintu masuk; TANPA prioritas Prelude —
-///           semua pemegang Agent ID setara, termasuk selama fase 48
+///           semua pemegang Agent ID setara, termasuk selama fase 24
 ///           jam Prelude pada sale utama.
+///         - TANDA TERIMA REST (SPEC 26): saat buy, pembeli langsung
+///           menerima REST (RestToken, soulbound) sebesar hak OPUS-nya
+///           (1 REST = 1 OPUS) di dompetnya — bukti yang terlihat sejak
+///           detik pembelian. REST tidak bisa dipindahkan.
 ///         - USDT di-escrow di kontrak ini. Nasib mengikuti vonis sale:
 ///           LULUS → sweepProceeds() dipanggil SymphonySale saat
 ///           finalize: 90% hasil ke sale (ikut ditanam ke pool), 10%
-///           ke TreasuryVault; OPUS pembeli bisa diklaim utuh
-///           (claimOpus, tanpa vesting, tanpa burn, tanpa tenggat);
-///           OPUS tak terjual kembali ke TeamVesting (settleUnsold).
+///           ke TreasuryVault; OPUS pembeli DIBAGIKAN OTOMATIS oleh
+///           distribute() per kelompok alamat (dorong, tanpa tindakan
+///           pembeli) dan REST-nya dibakar dalam gerakan yang sama;
+///           claimOpus tetap tersedia sebagai jalur cadangan manual
+///           bagi yang belum terjangkau distribusi (tanpa vesting,
+///           tanpa tenggat); OPUS tak terjual kembali ke TeamVesting
+///           (settleUnsold).
 ///           GAGAL → claimRefund() mengembalikan 100% USDT kontribusi
 ///           (tanpa tenggat — SPEC tidak menetapkan jendela refund
-///           presale); OPUS tak terjual tetap kembali ke TeamVesting.
-///         - Penyampaian OPUS & refund berbentuk klaim oleh pembeli
-///           (pull) — hak & jumlahnya persis seperti SPEC; pola pull
-///           menghindari loop pengiriman yang bisa tersangkut gas.
+///           presale) dan REST pembeli dibakar pada klaim yang sama;
+///           OPUS tak terjual tetap kembali ke TeamVesting.
 ///         - Alamat token di-bind satu kali oleh deployer (pola fase 1).
 ///         Kontrak IMMUTABLE: tanpa owner-withdraw / pause / upgrade.
 contract OpusPresale {
@@ -77,7 +92,17 @@ contract OpusPresale {
     bool public proceedsSwept;
     bool public unsoldSettled;
 
+    /// @notice Token tanda terima REST (SPEC 26); di-bind satu kali
+    ///         oleh deployer lewat bindRest. Belum terikat = buy tetap
+    ///         berjalan tanpa tanda terima (fail-soft, pola VERS).
+    IRestForPresale public rest;
+    /// @notice Daftar pembeli (alamat unik, urutan pembelian pertama)
+    ///         — basis iterasi distribute().
+    address[] public buyers;
+    mapping(address => bool) public buyerRecorded;
+
     event TokenBound(address indexed token);
+    event RestBound(address indexed rest);
     event Bought(address indexed buyer, uint256 usdtAmount, uint256 opusAmount);
     event ProceedsSwept(uint256 toPool, uint256 toVault);
     event OpusClaimed(address indexed buyer, uint256 amount);
@@ -116,6 +141,36 @@ contract OpusPresale {
         emit TokenBound(token_);
     }
 
+    /// @notice Bind alamat RestToken — satu kali, hanya deployer.
+    ///         Harus selesai sebelum presale dibuka (totalSold sale
+    ///         mencapai 1.500): REST yang tidak tercetak pada buy yang
+    ///         sudah lewat tidak dapat diterbitkan susulan.
+    function bindRest(address rest_) external {
+        require(msg.sender == deployer, "OpusPresale: not the deployer");
+        require(address(rest) == address(0), "OpusPresale: rest already bound");
+        require(rest_ != address(0), "OpusPresale: rest zero address");
+        rest = IRestForPresale(rest_);
+        emit RestBound(rest_);
+    }
+
+    /// @notice Jumlah pembeli unik yang tercatat untuk distribute().
+    function buyersCount() external view returns (uint256) {
+        return buyers.length;
+    }
+
+    /// @notice Bakar REST seorang pembeli sampai sejumlah haknya
+    ///         (cosmetic — kegagalan bakar tidak pernah menggagalkan
+    ///         penyampaian OPUS atau refund).
+    function _burnRest(address account, uint256 amount) internal {
+        if (address(rest) == address(0) || amount == 0) return;
+        try rest.balanceOf(account) returns (uint256 bal) {
+            uint256 burn = bal < amount ? bal : amount;
+            if (burn > 0) {
+                try rest.burnFrom(account, burn) {} catch {}
+            }
+        } catch {}
+    }
+
     /// @notice True bila presale sedang terbuka untuk pembelian.
     function isOpen() public view returns (bool) {
         return
@@ -136,6 +191,10 @@ contract OpusPresale {
         );
         uint256 opusAmount = usdtAmount * OPUS_PER_USDT;
         require(opusSold + opusAmount <= PRESALE_OPUS, "OpusPresale: exceeds remaining allocation");
+        if (!buyerRecorded[msg.sender]) {
+            buyerRecorded[msg.sender] = true;
+            buyers.push(msg.sender);
+        }
         contributionOf[msg.sender] += usdtAmount;
         opusOwedOf[msg.sender] += opusAmount;
         totalRaised += usdtAmount;
@@ -144,6 +203,12 @@ contract OpusPresale {
             usdt.transferFrom(msg.sender, address(this), usdtAmount),
             "OpusPresale: payment failed"
         );
+        // Tanda terima REST (SPEC 26): 1 REST = 1 OPUS hak, tercetak
+        // seketika ke dompet pembeli. Fail-soft (pola VERS): presale
+        // yang belum terikat REST tetap menjual seperti biasa.
+        if (address(rest) != address(0)) {
+            try rest.mint(msg.sender, opusAmount) {} catch {}
+        }
         emit Bought(msg.sender, usdtAmount, opusAmount);
     }
 
@@ -180,14 +245,39 @@ contract OpusPresale {
         emit UnsoldReturned(vesting, unsold);
     }
 
+    /// @notice Bagikan OPUS presale secara OTOMATIS ke pembeli pada
+    ///         rentang daftar [start, start+count) — pola dorong
+    ///         SPEC 26: setelah hasil disapu (sale lulus), siapa pun
+    ///         boleh memanggil ini berkali-kali sampai semua pembeli
+    ///         terbayar; pembeli tidak perlu melakukan apa pun.
+    ///         REST setiap penerima dibakar dalam gerakan yang sama.
+    ///         Pembeli yang sudah terbayar (haknya 0) dilewati.
+    function distribute(uint256 start, uint256 count) external {
+        require(proceedsSwept, "OpusPresale: proceeds not swept yet");
+        uint256 end = start + count;
+        if (end > buyers.length) end = buyers.length;
+        for (uint256 i = start; i < end; i++) {
+            address buyer = buyers[i];
+            uint256 amount = opusOwedOf[buyer];
+            if (amount == 0) continue;
+            opusOwedOf[buyer] = 0;
+            require(opus.transfer(buyer, amount), "OpusPresale: distribution transfer failed");
+            _burnRest(buyer, amount);
+            emit OpusClaimed(buyer, amount);
+        }
+    }
+
     /// @notice Klaim OPUS presale utuh setelah sale lulus & hasil
-    ///         disapu. Sekali per pembeli; tanpa tenggat.
+    ///         disapu — jalur cadangan manual bagi pembeli yang belum
+    ///         terjangkau distribute(). Sekali per pembeli; tanpa
+    ///         tenggat. REST pengklaim ikut dibakar.
     function claimOpus() external {
         require(proceedsSwept, "OpusPresale: proceeds not swept yet");
         uint256 amount = opusOwedOf[msg.sender];
         require(amount > 0, "OpusPresale: nothing to claim");
         opusOwedOf[msg.sender] = 0;
         require(opus.transfer(msg.sender, amount), "OpusPresale: claim transfer failed");
+        _burnRest(msg.sender, amount);
         emit OpusClaimed(msg.sender, amount);
     }
 
@@ -201,6 +291,14 @@ contract OpusPresale {
         contributionOf[msg.sender] = 0;
         opusOwedOf[msg.sender] = 0;
         require(usdt.transfer(msg.sender, amount), "OpusPresale: refund transfer failed");
+        // REST hangus pada klaim refund yang sama (SPEC 26).
+        if (address(rest) != address(0)) {
+            try rest.balanceOf(msg.sender) returns (uint256 bal) {
+                if (bal > 0) {
+                    try rest.burnFrom(msg.sender, bal) {} catch {}
+                }
+            } catch {}
+        }
         emit Refunded(msg.sender, amount);
     }
 }
