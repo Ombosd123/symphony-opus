@@ -2,8 +2,9 @@
 // Tiga skenario tumpukan kontrak penuh (pola test.mjs fase 1):
 //   A — jalur LULUS: gerbang 500 + gerbang tanggal, jendela 24 jam
 //       Prelude, tier & batas tier, referral sale, presale (buka tepat
-//       di totalSold 1.500, cap, split), market (lantai 80%, fee 5%,
-//       gate pembeli, Magnum), habis lebih awal tetap terkunci sampai
+//       di totalSold 1.500, cap, split), market (buka hanya setelah
+//       sale habis terjual — amendemen 2026-11-27; lantai 80%, fee
+//       5%, gate pembeli, Magnum), habis lebih awal tetap terkunci sampai
 //       vonis, finalize di vonis (pool V2, LP bakar, treasury 10%,
 //       sapuan Soundcheck, bakar sisa referral), klaim Premiere /
 //       Encore (50/50 + vesting + bonus cap + sisa dibakar + kursi +
@@ -12,8 +13,8 @@
 //       distributor Merkle (3 kolam + burn-to-claim + sisa dibakar),
 //       vesting tim (cliff 30 hari, linear, lunas hari ke-395).
 //   B — jalur GAGAL: finalize gagal di vonis, refund burn-to-settle
-//       dalam jendela (dan revert setelahnya), market tutup & listing
-//       kembali, presale refund + OPUS tak terjual ke vesting,
+//       dalam jendela (dan revert setelahnya), market tidak pernah
+//       buka (sale tak habis), presale refund + OPUS tak terjual ke vesting,
 //       Soundcheck markFailed + klaim pool share, distributor dibakar.
 //   C — gerbang 500 belum terpenuhi saat 12 Des: buy revert; setelah
 //       pendaftar ke-500 masuk, sale membuka (openedAt terpatri) dan
@@ -446,10 +447,26 @@ await bulkToA(4501);
 eq(Number(await A.pass.tierOf(4501)), 3, "A: Pass #4501 = Tier 3");
 eq(await A.pass.paidOf(4501), E(2), "A: Pass #4501 paidOf 2 USDT");
 
-// ---------- market (hari 43, masa sale) ----------
+// ---------- market: tertutup sebelum habis (hari 43, totalSold 4.501) ----------
 console.log("— Skenario A: market —");
 const passReg5 = idsReg5[0];
 eq(await A.market.floorOf(passReg5), E("0.8"), "A: lantai Pass T1 = 0,8 USDT");
+ok(!(await A.market.isOpen()), "A: market TERTUTUP selama sale belum habis (amendemen 2026-11-27)");
+await expectRevert(A.market.connect(regA(5)).listPass, [passReg5, E("0.8")], "market closed", "A: listing sebelum habis revert — market belum buka");
+
+// Penjualan dilengkapi sampai habis (hari 43); market membuka.
+await bulkToA(5000);
+eq(Number(await A.pass.totalMinted()), 5000, "A: 5.000 Pass tercetak");
+ok(await A.market.isOpen(), "A: market TERBUKA tepat saat sale habis terjual");
+await fundUsdt(signers[9], E(100));
+await approveMax(signers[9], await A.sale.getAddress());
+await expectRevert(A.sale.connect(signers[9]).buy, [1, ZERO], "not enough Passes left", "A: buy setelah habis revert");
+await expectRevert(A.sale.connect(regA(0)).claimPremiere, [idsReg0[0]], "not graduated", "A: klaim sebelum vonis revert (habis lebih awal tetap terkunci)");
+await expectRevert(A.sale.connect(regA(7)).claimEncore, [idsReg7[0]], "not graduated", "A: Encore sebelum vonis revert — kunci tidak bisa terbit sebelum graduation");
+eq(Number(await A.scherzoKey.totalKeys()), 0, "A: totalKeys tetap 0 sebelum graduation");
+await expectRevert(A.sale.finalize, [], "verdict not reached", "A: finalize sebelum vonis revert");
+
+// Market Pass setelah habis: lantai, escrow, fee 5%, delist.
 await expectRevert(A.market.connect(regA(5)).listPass, [passReg5, E("0.79")], "price below floor", "A: listing di bawah lantai revert");
 const listTx = await A.market.connect(regA(5)).listPass(passReg5, E("0.8"), GL);
 await listTx.wait();
@@ -478,7 +495,7 @@ for (let d = 44; d <= 53; d++) {
 ok(await A.sc.hasMagnum(addrs[11]), "A: comp1 memegang Magnum (streak 14)");
 ok(await A.sc.hasMagnum(addrs[12]), "A: comp2 memegang Magnum (dengan 1 repair)");
 
-// Hari 54: Magnum diperdagangkan; penjualan dilengkapi sampai habis.
+// Hari 54: Magnum diperdagangkan (market sudah terbuka sejak habis).
 await advanceTo(54);
 const magnumComp2 = Number(await A.sc.badgeOf(addrs[12], 5));
 const magListTx = await A.market.connect(comp2).listMagnum(magnumComp2, E(3), GL);
@@ -486,15 +503,6 @@ await magListTx.wait();
 await A.market.connect(marketBuyer).buy(3, GL);
 ok(await A.sc.hasMagnum(addrs[4]), "A: Magnum berpindah ke pembeli market");
 ok(!(await A.sc.hasMagnum(addrs[12])), "A: comp2 tidak lagi memegang Magnum");
-await bulkToA(5000);
-eq(Number(await A.pass.totalMinted()), 5000, "A: 5.000 Pass tercetak");
-await fundUsdt(signers[9], E(100));
-await approveMax(signers[9], await A.sale.getAddress());
-await expectRevert(A.sale.connect(signers[9]).buy, [1, ZERO], "not enough Passes left", "A: buy setelah habis revert");
-await expectRevert(A.sale.connect(regA(0)).claimPremiere, [idsReg0[0]], "not graduated", "A: klaim sebelum vonis revert (habis lebih awal tetap terkunci)");
-await expectRevert(A.sale.connect(regA(7)).claimEncore, [idsReg7[0]], "not graduated", "A: Encore sebelum vonis revert — kunci tidak bisa terbit sebelum graduation");
-eq(Number(await A.scherzoKey.totalKeys()), 0, "A: totalKeys tetap 0 sebelum graduation");
-await expectRevert(A.sale.finalize, [], "verdict not reached", "A: finalize sebelum vonis revert");
 
 // ---------- hari ke-58: VONIS — finalize jalur lulus ----------
 await advanceTo(58);
@@ -740,8 +748,9 @@ await usdt.connect(regsB[0]).approve(await B.sc.getAddress(), E("0.1"), GL);
 await B.sc.connect(regsB[0]).repairStreak(GL);
 await B.sc.connect(regsB[0]).checkIn(GL);
 await advanceTo(45);
-const listTxB = await B.market.connect(regsB[1]).listPass(idsB1[0], E("0.8"), GL);
-await listTxB.wait();
+// Market tidak pernah membuka di jalur gagal (sale tidak habis):
+ok(!(await B.market.isOpen()), "B: market tertutup di totalSold 1.600 (amendemen 2026-11-27)");
+await expectRevert(B.market.connect(regsB[1]).listPass, [idsB1[0], E("0.8")], "market closed", "B: listing revert — market tertutup selama sale belum habis");
 
 // ---------- vonis: GAGAL ----------
 await advanceTo(58);
@@ -758,10 +767,9 @@ eq(await B.pass.ownerOf(21), addrs[602], "B: Pass #21 milik regsB[2]");
 await B.sale.connect(regsB[2]).refund(21, GL);
 eq((await usdt.balanceOf(addrs[602])) - usdtB2Before, E(1), "B: refund membayar penuh 1 USDT (Tier 1)");
 await expectRevert(B.pass.ownerOf, [21], "nonexistent token", "B: Pass refund ter-burn");
-// Market beku: beli revert; penjual menarik kembali Pass-nya lalu refund
-await expectRevert(B.market.connect(marketBuyer).buy, [1], "market closed", "B: market beku setelah vonis gagal");
-await B.market.connect(regsB[1]).cancel(1, GL);
-eq(await B.pass.ownerOf(idsB1[0]), addrs[601], "B: listing kembali ke penjual setelah gagal");
+// Market tidak pernah buka: beli revert; Pass tetap di penjual lalu refund
+await expectRevert(B.market.connect(marketBuyer).buy, [1], "market closed", "B: market tetap tertutup setelah vonis gagal");
+eq(await B.pass.ownerOf(idsB1[0]), addrs[601], "B: Pass tak pernah meninggalkan penjual (market tak pernah buka)");
 await B.sale.connect(regsB[1]).refund(idsB1[0], GL);
 // Presale: refund penuh
 const usdtPBBefore = await usdt.balanceOf(addrs[1100]);
@@ -852,13 +860,7 @@ for (const s of buyersD) await buyD(s, 10, addrs[600]);
 eq(Number(await SD.sale.totalSold()), 3022, "D: totalSold 3.022 setelah pembelian referral massal");
 eq(await SD.sale.totalReferralAccrued(), E(15_000_000), "D: akru referral BERHENTI tepat di pagar 15 jt (3.010 Pass bereferral diajukan)");
 eq(await SD.sale.referralAccrued(addrs[600]), E(15_000_000), "D: referralAccrued referrer = 15 jt penuh, tidak lebih");
-// Pass ke-11 badgeD lewat market resmi (cap 10 hanya untuk primer).
-const listTxD = await SD.market.connect(sellerD).listPass(idsSellerD[0], E(1), GL);
-await listTxD.wait();
-await approveMax(badgeD, await SD.market.getAddress());
-await SD.market.connect(badgeD).buy(1, GL);
-eq(Number(await SD.pass.balanceOf(addrs[601])), 11, "D: badgeD memegang 11 Pass (10 primer + 1 market)");
-// Isi sampai habis tanpa referral, lalu vonis.
+// Isi sampai habis tanpa referral (market baru membuka setelah habis).
 let remainingD = 5000 - Number(await SD.sale.totalSold());
 for (const s of fillD) {
   if (remainingD <= 0) break;
@@ -867,6 +869,12 @@ for (const s of fillD) {
   remainingD -= n;
 }
 eq(Number(await SD.sale.totalSold()), 5000, "D: totalSold 5.000 (habis)");
+// Pass ke-11 badgeD lewat market resmi (cap 10 hanya untuk primer).
+const listTxD = await SD.market.connect(sellerD).listPass(idsSellerD[0], E(1), GL);
+await listTxD.wait();
+await approveMax(badgeD, await SD.market.getAddress());
+await SD.market.connect(badgeD).buy(1, GL);
+eq(Number(await SD.pass.balanceOf(addrs[601])), 11, "D: badgeD memegang 11 Pass (10 primer + 1 market)");
 await advanceTo(58);
 await SD.sale.connect(anyone).finalize(GL_BIG);
 ok(await SD.sale.graduated(), "D: sale LULUS di vonis");
