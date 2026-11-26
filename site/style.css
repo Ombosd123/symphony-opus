@@ -434,3 +434,28 @@ main section { animation: symphonyRise 0.7s ease both; }
   font-size: 14px; font-weight: 700; cursor: pointer;
 }
 .mk-empty { grid-column: 1 / -1; padding: 8px 2px; font-size: 14px; }
+.mk-tabs { display: flex; gap: 10px; margin: 14px 0 0; }
+.mk-tab {
+  flex: 1; padding: 9px 0; background: var(--card); color: var(--muted);
+  border: 1px solid var(--line); border-radius: 10px;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+}
+.mk-tab.active { background: var(--gold); color: #141414; border-color: var(--gold); }
+.mk-price-input {
+  display: flex; align-items: center; gap: 6px; margin-top: 8px;
+  background: var(--bg2); border: 1px solid var(--line); border-radius: 8px;
+  padding: 7px 9px;
+}
+.mk-price-input.bad { border-color: #e5484d; }
+.mk-price-input input {
+  flex: 1; min-width: 0; background: transparent; border: 0; outline: 0;
+  color: var(--text); font-size: 14px;
+}
+.mk-price-input span { color: var(--muted); font-size: 11px; }
+.mk-listed { color: #2dd4bf; font-size: 11px; font-weight: 700; margin-top: 4px; }
+.mk-cancel {
+  width: 100%; margin-top: 9px; padding: 8px 0; font-size: 13px; font-weight: 700;
+  background: transparent; color: #ff8a8a; border: 1px solid #7a3b3b;
+  border-radius: 10px; cursor: pointer;
+}
+.mk-sell-note { margin-top: 10px; line-height: 1.6; }
