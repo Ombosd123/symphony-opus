@@ -527,13 +527,13 @@ await A.sale.connect(comp1).claimReferral(GL);
 eq(await A.opus.balanceOf(addrs[11]), E(50_000), "A: reg1 mengklaim referral 50.000 OPUS");
 await expectRevert(A.sale.connect(comp1).claimReferral, [], "no referral balance", "A: klaim referral dua kali revert");
 await A.sale.connect(regA(0)).claimPremiere(idsReg0[0], GL);
-eq(await A.opus.balanceOf(addrs[10]), E(78_000), "A: Premiere Tier 1 membayar 78.000 OPUS");
+eq(await A.opus.balanceOf(addrs[10]), E(68_100), "A: Premiere Tier 1 membayar 68.100 OPUS");
 await expectRevert(A.pass.ownerOf, [idsReg0[0]], "nonexistent token", "A: Pass Premiere ter-burn");
 eq(Number(await A.scherzoKey.keyOf(addrs[10])), 0, "A: klaim Premiere TIDAK menerbitkan kunci SCHERZO");
 await A.sale.connect(regA(7)).claimEncore(idsReg7[0], GL);
-eq(await A.opus.balanceOf(addrs[17]), E(39_000), "A: Encore membayar 50% langsung (39.000)");
+eq(await A.opus.balanceOf(addrs[17]), E(34_050), "A: Encore membayar 50% langsung (34.050)");
 eq(Number(await A.sale.scherzoOvertureSeats(addrs[17])), 1, "A: kursi Overture Scherzo tercatat on-chain");
-eq(await A.sale.totalEncoreVestedOf(addrs[17]), E(39_000), "A: bagian vesting Encore reg7 = 39.000");
+eq(await A.sale.totalEncoreVestedOf(addrs[17]), E(34_050), "A: bagian vesting Encore reg7 = 34.050");
 // Kunci SCHERZO reg7: terbit tepat satu pada Encore pertamanya.
 eq(Number(await A.scherzoKey.keyOf(addrs[17])), 1, "A: kunci SCHERZO #1 terbit untuk reg7 pada Encore pertamanya");
 eq(await A.scherzoKey.ownerOf(1), addrs[17], "A: kunci #1 milik reg7");
@@ -551,13 +551,13 @@ await expectRevert(A.scherzoKey.connect(regA(7)).setApprovalForAll, [addrs[10], 
 // (Pass berbeda, wallet sama) TIDAK menerbitkan kunci lagi, tetapi
 // klaimnya berhasil persis sama (50% langsung + 50% vesting bertumpuk).
 await A.sale.connect(regA(6)).claimEncore(idsReg6[1], GL);
-eq(await A.opus.balanceOf(addrs[16]), E(39_000), "A: Encore pertama reg6 membayar 50% langsung (39.000)");
+eq(await A.opus.balanceOf(addrs[16]), E(34_050), "A: Encore pertama reg6 membayar 50% langsung (34.050)");
 eq(Number(await A.scherzoKey.keyOf(addrs[16])), 2, "A: kunci SCHERZO #2 terbit untuk reg6 pada Encore pertamanya");
 eq(Number(await A.scherzoKey.totalKeys()), 2, "A: totalKeys = 2 (dua wallet Encore)");
 const opusReg6Before2nd = await A.opus.balanceOf(addrs[16]);
 await A.sale.connect(regA(6)).claimEncore(idsReg6[2], GL);
-eq((await A.opus.balanceOf(addrs[16])) - opusReg6Before2nd, E(39_000), "A: Encore kedua reg6 membayar 50% langsung yang sama (39.000)");
-eq(await A.sale.totalEncoreVestedOf(addrs[16]), E(78_000), "A: vesting Encore reg6 bertumpuk 2 × 39.000");
+eq((await A.opus.balanceOf(addrs[16])) - opusReg6Before2nd, E(34_050), "A: Encore kedua reg6 membayar 50% langsung yang sama (34.050)");
+eq(await A.sale.totalEncoreVestedOf(addrs[16]), E(68_100), "A: vesting Encore reg6 bertumpuk 2 × 34.050");
 eq(Number(await A.sale.scherzoOvertureSeats(addrs[16])), 2, "A: catatan internal sale menghitung 2 Pass Encore reg6");
 eq(Number(await A.scherzoKey.keyOf(addrs[16])), 2, "A: kunci reg6 TETAP #2 — tidak ada kunci kedua untuk wallet yang sama");
 eq(Number(await A.scherzoKey.totalKeys()), 2, "A: totalKeys tetap 2 setelah Encore kedua reg6");
@@ -567,13 +567,13 @@ eq(Number(await A.scherzoKey.balanceOf(addrs[16])), 1, "A: balanceOf kunci reg6 
 // Bonus badge AgentQuest (amendemen SPEC 18): holder badge menerima
 // +5.000 OPUS per klaim Premiere; non-holder tidak menerima apa pun.
 await A.sale.connect(signers[580]).claimPremiere(idsBadgeA[0], GL);
-eq(await A.opus.balanceOf(addrs[580]), E(83_000), "A: Premiere holder badge = 78.000 + bonus badge 5.000");
+eq(await A.opus.balanceOf(addrs[580]), E(73_100), "A: Premiere holder badge = 68.100 + bonus badge 5.000");
 await A.sale.connect(signers[580]).claimPremiere(idsBadgeA[1], GL);
-eq(await A.opus.balanceOf(addrs[580]), E(166_000), "A: klaim badge kedua tetap +5.000");
+eq(await A.opus.balanceOf(addrs[580]), E(146_200), "A: klaim badge kedua tetap +5.000");
 eq(Number(await A.sale.badgeCounted(addrs[580])), 2, "A: badgeCounted holder = 2");
 eq(await A.sale.badgePoolPaid(), E(10_000), "A: badgePoolPaid = 10.000");
 await A.sale.connect(nonReg).claimPremiere(idsNonReg[0], GL);
-eq(await A.opus.balanceOf(addrs[5]), E(78_000), "A: Premiere non-badge tepat 78.000 (tanpa bonus)");
+eq(await A.opus.balanceOf(addrs[5]), E(68_100), "A: Premiere non-badge tepat 68.100 (tanpa bonus)");
 eq(Number(await A.sale.badgeCounted(addrs[5])), 0, "A: badgeCounted non-holder = 0");
 
 // ---------- distributor (hari 58, di dalam jendela klaim) ----------
@@ -649,21 +649,21 @@ eq(Number(await A.scherzoKey.keyOf(addrs[18])), 0, "A: tidak ada kunci dari Enco
 // Premiere tetap bisa setelah jendela (tanpa tenggat) — reg0 masih punya 9 Pass:
 await A.sale.connect(regA(0)).claimPremiere(idsReg0[1], GL);
 eq(Number(await A.scherzoKey.keyOf(addrs[10])), 0, "A: Premiere setelah jendela tutup tetap tidak menerbitkan kunci");
-eq(await A.opus.balanceOf(addrs[10]), E(78_000) + E(14_960_000) + E(78_000), "A: Premiere tetap membayar penuh setelah jendela Encore tutup");
+eq(await A.opus.balanceOf(addrs[10]), E(68_100) + E(14_960_000) + E(68_100), "A: Premiere tetap membayar penuh setelah jendela Encore tutup");
 // Encore reg7: separuh vesting pada hari ke-30
 const encBefore = await A.opus.balanceOf(addrs[17]);
 await A.sale.connect(regA(7)).withdrawEncore(GL);
-closeTo(await A.opus.balanceOf(addrs[17]), encBefore + E(19_500), E(200), "A: withdraw Encore hari ke-30 ≈ 19.500");
+closeTo(await A.opus.balanceOf(addrs[17]), encBefore + E(17_025), E(200), "A: withdraw Encore hari ke-30 ≈ 17.025");
 // Bonus Encore: vested 39.000 → bonus = 19.500 (tepat cap 50%)
 const bonusBefore = await A.opus.balanceOf(addrs[17]);
 await A.sale.connect(regA(7)).claimEncoreBonus(GL);
-eq((await A.opus.balanceOf(addrs[17])) - bonusBefore, E(19_500), "A: bonus Encore reg7 membayar 19.500");
-eq(await A.sale.encoreBonusOf(addrs[17]), E(19_500), "A: hak bonus Encore reg7 = 19.500 (cap 50% dari vesting)");
+eq((await A.opus.balanceOf(addrs[17])) - bonusBefore, E(17_025), "A: bonus Encore reg7 membayar 17.025");
+eq(await A.sale.encoreBonusOf(addrs[17]), E(17_025), "A: hak bonus Encore reg7 = 17.025 (cap 50% dari vesting)");
 ok(await A.sale.encoreBonusClaimed(addrs[17]), "A: bonus Encore reg7 tertanda terklaim");
 // Sisa pool Encore dibakar
 const supplyBeforeBurn = await A.opus.totalSupply();
 await A.sale.connect(anyone).burnEncoreRemainder(GL);
-eq(supplyBeforeBurn - (await A.opus.totalSupply()), E("4941500"), "A: sisa pool Encore 4.941.500 dibakar (5 jt − total vesting 117.000/2; vesting kini termasuk 2 Encore reg6)");
+eq(supplyBeforeBurn - (await A.opus.totalSupply()), E("4948925"), "A: sisa pool Encore 4.948.925 dibakar (5 jt − total vesting 102.150/2; vesting kini termasuk 2 Encore reg6)");
 
 // ---------- hari 89: jendela distributor tutup ----------
 await advanceTo(89);
@@ -684,7 +684,7 @@ eq(await A.opus.balanceOf(await A.distributor.getAddress()), E(4_994_900), "A: s
 await advanceTo(120);
 const encBefore2 = await A.opus.balanceOf(addrs[17]);
 await A.sale.connect(regA(7)).withdrawEncore(GL);
-closeTo((await A.opus.balanceOf(addrs[17])) - encBefore2, E(19_500), E(200), "A: withdraw Encore terakhir ≈ 19.500 (total vesting 39.000)");
+closeTo((await A.opus.balanceOf(addrs[17])) - encBefore2, E(17_025), E(200), "A: withdraw Encore terakhir ≈ 17.025 (total vesting 34.050)");
 
 // ---------- vesting tim ----------
 console.log("— Skenario A: vesting tim —");
@@ -876,17 +876,17 @@ eq(await SD.opus.totalSupply(), E(600_000_000), "D: bakar referral di finalize =
 const balD = async () => await SD.opus.balanceOf(addrs[601]);
 let beforeD = await balD();
 await SD.sale.connect(badgeD).claimEncore(idsBadgeD[0], GL);
-eq((await balD()) - beforeD, E(44_000), "D: Encore holder badge = 39.000 langsung + bonus badge 5.000");
+eq((await balD()) - beforeD, E(39_050), "D: Encore holder badge = 34.050 langsung + bonus badge 5.000");
 for (let i = 1; i < 10; i++) {
   beforeD = await balD();
   await SD.sale.connect(badgeD).claimPremiere(idsBadgeD[i], GL);
-  eq((await balD()) - beforeD, E(83_000), `D: Premiere badge ke-${i + 1} = 78.000 + 5.000`);
+  eq((await balD()) - beforeD, E(73_100), `D: Premiere badge ke-${i + 1} = 68.100 + 5.000`);
 }
 eq(Number(await SD.sale.badgeCounted(addrs[601])), 10, "D: badgeCounted berhenti tepat di cap 10");
 eq(await SD.sale.badgePoolPaid(), E(50_000), "D: badgePoolPaid = 50.000 (10 × 5.000)");
 beforeD = await balD();
 await SD.sale.connect(badgeD).claimPremiere(idsSellerD[0], GL);
-eq((await balD()) - beforeD, E(78_000), "D: Pass ke-11 (dari market) TANPA bonus — cap per wallet tercapai");
+eq((await balD()) - beforeD, E(68_100), "D: Pass ke-11 (dari market) TANPA bonus — cap per wallet tercapai");
 
 console.log(`\n=== HASIL FASE 2: ${passed} PASS, ${failed} FAIL ===`);
 if (failed > 0) process.exit(1);

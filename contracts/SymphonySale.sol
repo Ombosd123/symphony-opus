@@ -89,8 +89,9 @@ interface IPancakePair {
 /// @notice SPEC-SYMPHONY.md bagian 2, 5, 6, 9 & 10 (fase 2):
 ///         - Escrow USDT. 5.000 Pass, maks 10 pembelian primer/wallet.
 ///           Tier dari URUTAN penjualan (totalSold): 1–1.500 Overture
-///           1 USDT → 78.000 OPUS; 1.501–4.500 Crescendo 1,5 USDT →
-///           65.000; 4.501–5.000 Finale 2 USDT → 57.000. Raise penuh
+///           1 USDT; 1.501–4.500 Crescendo 1,5 USDT; 4.501–5.000
+///           Finale 2 USDT. SEMUA tier mengklaim 68.100 OPUS per
+///           Pass (rata — keputusan 2026-11-26, SPEC §22). Raise penuh
 ///           7.000 USDT; alokasi peserta 340,5 jt dipegang kontrak ini
 ///           (bersama pool 159,5 jt + referral 25 jt + Encore 5 jt yang
 ///           dicetak OpusToken ke sini).
@@ -363,16 +364,16 @@ contract SymphonySale {
     ///         penjualan `position` (1-based, dari totalSold).
     function tierFor(uint256 position) public pure returns (uint8 tier, uint256 price, uint256 claim) {
         require(position >= 1 && position <= TOTAL_PASSES, "SymphonySale: bad position");
-        if (position <= 1_500) return (1, 1 ether, 78_000 ether);
-        if (position <= 4_500) return (2, 1.5 ether, 65_000 ether);
-        return (3, 2 ether, 57_000 ether);
+        if (position <= 1_500) return (1, 1 ether, 68_100 ether);
+        if (position <= 4_500) return (2, 1.5 ether, 68_100 ether);
+        return (3, 2 ether, 68_100 ether);
     }
 
     /// @notice Hak klaim OPUS menurut nomor tier.
     function claimOfTier(uint8 tier) public pure returns (uint256) {
-        if (tier == 1) return 78_000 ether;
-        if (tier == 2) return 65_000 ether;
-        if (tier == 3) return 57_000 ether;
+        if (tier == 1) return 68_100 ether;
+        if (tier == 2) return 68_100 ether;
+        if (tier == 3) return 68_100 ether;
         return 0;
     }
 

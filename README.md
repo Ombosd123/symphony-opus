@@ -31,9 +31,9 @@ Edition 1 is **Rhapsody No. 1**.
 | | |
 |---|---|
 | Passes | 5,000 (max 10 per wallet) |
-| Tier 1 — Overture (Pass 1–1,500) | 1 USDT → 78,000 OPUS |
-| Tier 2 — Crescendo (Pass 1,501–4,500) | 1.5 USDT → 65,000 OPUS |
-| Tier 3 — Finale (Pass 4,501–5,000) | 2 USDT → 57,000 OPUS |
+| Tier 1 — Overture (Pass 1–1,500) | 1 USDT → 68,100 OPUS |
+| Tier 2 — Crescendo (Pass 1,501–4,500) | 1.5 USDT → 68,100 OPUS |
+| Tier 3 — Finale (Pass 4,501–5,000) | 2 USDT → 68,100 OPUS |
 | Full raise | 7,000 USDT |
 | Split | 90% liquidity pool / 10% treasury (TreasuryVault) |
 | Token supply | 600,000,000 OPUS (plain ERC-20, no transfer tax) |
