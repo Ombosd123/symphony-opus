@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Leaderboard — SYMPHONY ($OPUS)</title>
-<meta name="description" content="SYMPHONY ($OPUS) leaderboards — top Soundcheck streaks and top Prelude referrers, read from the contracts.">
+<meta name="description" content="SYMPHONY ($OPUS) leaderboards — top Soundcheck streaks, top Prelude referrers, top Pass holders and top presale backers, read from the contracts.">
 <link rel="icon" type="image/png" href="assets/logo.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Leaderboard — SYMPHONY ($OPUS)">
-<meta property="og:description" content="Top Soundcheck streaks and top Prelude referrers — read from the contracts.">
+<meta property="og:description" content="Top Soundcheck streaks, top referrers, top holders and top presale backers — read from the contracts.">
 <meta property="og:image" content="https://symphony-opus.pages.dev/assets/intro-poster.webp">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="style.css">
@@ -42,39 +42,37 @@
 <main>
   <section>
     <h2 data-i18n="lb_title">Leaderboard</h2>
-    <p class="muted" data-i18n="lb_intro">Two boards, read from the contracts: who shows up every day, and who brings the orchestra together.</p>
-    <div class="lbgrid">
-      <div>
-        <h3 data-i18n="lb_checkin_title">Soundcheck — top streaks</h3>
-        <table>
-          <thead><tr>
-            <th data-i18n="lb_col_rank">#</th>
-            <th data-i18n="lb_col_player">Player</th>
-            <th data-i18n="lb_col_streak">Streak</th>
-            <th data-i18n="lb_col_total">Check-in days</th>
-          </tr></thead>
-          <tbody id="lbCheckinBody"></tbody>
-        </table>
-        <p class="small muted" id="lbCheckinEmpty" data-i18n="lb_empty" hidden>No entries yet.</p>
-      </div>
-      <div>
-        <h3 data-i18n="lb_ref_title">Prelude — top referrers</h3>
-        <table>
-          <thead><tr>
-            <th data-i18n="lb_col_rank">#</th>
-            <th data-i18n="lb_col_player">Player</th>
-            <th data-i18n="lb_col_refs">Referrals</th>
-          </tr></thead>
-          <tbody id="lbRefBody"></tbody>
-        </table>
-        <p class="small muted" id="lbRefEmpty" data-i18n="lb_empty" hidden>No entries yet.</p>
-      </div>
+    <p class="muted" data-i18n="lb_intro">Four boards, read from the contracts: who shows up every day, who brings the orchestra together — and, soon, who holds the most and who backed the presale.</p>
+    <div class="lbtabs">
+      <button type="button" class="lbtab active" data-tab="soundcheck" data-i18n="lb_tab_soundcheck">Soundcheck</button>
+      <button type="button" class="lbtab" data-tab="referral" data-i18n="lb_tab_referral">Referral</button>
+      <button type="button" class="lbtab" data-tab="holder"><span data-i18n="lb_tab_holder">Holder</span><span class="lbsoon" data-i18n="lb_soon">Soon</span></button>
+      <button type="button" class="lbtab" data-tab="presale"><span data-i18n="lb_tab_presale">Presale</span><span class="lbsoon" data-i18n="lb_soon">Soon</span></button>
+    </div>
+    <h3 id="lbBoardTitle">Soundcheck — top streaks</h3>
+    <div id="lbTableWrap">
+      <table>
+        <thead id="lbHead"></thead>
+        <tbody id="lbBody"></tbody>
+      </table>
+      <p class="small muted" id="lbEmpty" data-i18n="lb_empty" hidden>No entries yet.</p>
+    </div>
+    <div id="lbSoonPanel" class="soonpanel" hidden>
+      <p><strong id="lbSoonTitle"></strong></p>
+      <p id="lbSoonText"></p>
+      <p class="small" id="lbSoonCols"></p>
+    </div>
+    <div class="yourow">
+      <span id="lbYouText">Connect your wallet to see your rank.</span>
+      <button id="lbConnectBtn" type="button" data-i18n="lb_connect">Connect</button>
     </div>
     <p class="small muted"><span data-i18n="lb_updated">Updated</span>: <span id="lbUpdated">—</span></p>
     <p class="small muted" data-i18n="lb_note">Addresses are shortened; the full records are on-chain. The boards refresh periodically.</p>
   </section>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
 <script src="config.js"></script>
+<script src="abi.js"></script>
 <script src="i18n.js"></script>
 <script src="melody.js"></script>
 <script src="leaderboard.js"></script>

@@ -16,6 +16,7 @@ Output: site/leaderboard-data.json. Safe to re-run any time.
 """
 import json
 import os
+import re
 import sys
 import time
 
@@ -35,6 +36,8 @@ SEL = {
     "referralCount": Web3.keccak(text="referralCount(address)")[:4].hex(),
     "streakOf": Web3.keccak(text="streakOf(address)")[:4].hex(),
     "totalCheckInsOf": Web3.keccak(text="totalCheckInsOf(address)")[:4].hex(),
+    "totalSupply": Web3.keccak(text="totalSupply()")[:4].hex(),
+    "balanceOf": Web3.keccak(text="balanceOf(address)")[:4].hex(),
 }
 
 
@@ -94,6 +97,13 @@ def to_addr(h):
     return "0x" + h[-40:].lower() if h else None
 
 
+def fmt_units(wei):
+    whole, frac = divmod(int(wei), 10 ** 18)
+    if frac == 0:
+        return str(whole)
+    return f"{whole}.{frac:018d}".rstrip("0")
+
+
 def main():
     count = to_int(batch_call([(PRELUDE, SEL["count"])])[0])
     print(f"registrants (count): {count}")
@@ -113,7 +123,7 @@ def main():
     referral = sorted(
         ({"addr": a, "refs": n} for a, n in refs.items() if n > 0),
         key=lambda r: (-r["refs"], first_pass.get(r["addr"], 1 << 30)),
-    )[:10]
+    )
 
     candidates = set(uniq_owners)
     if os.path.exists(LEDGER):
@@ -130,7 +140,54 @@ def main():
         total = to_int(t)
         if total > 0:
             rows.append({"addr": a, "streak": to_int(s), "total": total})
-    checkin = sorted(rows, key=lambda r: (-r["streak"], -r["total"], r["addr"]))[:10]
+    # Full standings, not just the top 9: the page slices the top 9
+    # for display and computes the visitor's own rank against the
+    # full list.
+    checkin = sorted(rows, key=lambda r: (-r["streak"], -r["total"], r["addr"]))
+
+    # Phase-2 boards — populated automatically once the addresses
+    # exist in site/config.js (filled after the 7 Dec deploy). While
+    # an address is empty the board stays null and the page shows
+    # "Soon"; the first minted Pass / first REST flips it live at
+    # the next daily run, with no code change and no manual switch.
+    holder = None
+    presale = None
+    cfg = {}
+    try:
+        cfg_text = open(os.path.join(HERE, "site", "config.js")).read()
+        for key in ("PASS_ADDRESS", "VERS_ADDRESS", "REST_ADDRESS"):
+            m = re.search(key + r':\s*"(0x[0-9a-fA-F]{40})"', cfg_text)
+            if m:
+                cfg[key] = m.group(1)
+    except OSError:
+        pass
+    pass_counts = {}
+    if cfg.get("PASS_ADDRESS"):
+        supply = to_int(batch_call([(cfg["PASS_ADDRESS"], SEL["totalSupply"])])[0])
+        owners_raw = batch_call([(cfg["PASS_ADDRESS"], SEL["ownerOf"] + enc_uint(i))
+                                  for i in range(1, supply + 1)])
+        for h in owners_raw:
+            a = to_addr(h)
+            if a:
+                pass_counts[a] = pass_counts.get(a, 0) + 1
+        if pass_counts:
+            if cfg.get("VERS_ADDRESS"):
+                vers_raw = batch_call([(cfg["VERS_ADDRESS"], SEL["balanceOf"] + enc_addr(a))
+                                        for a in pass_counts])
+                vers = {a: to_int(h) for a, h in zip(pass_counts, vers_raw)}
+            else:
+                vers = {a: 0 for a in pass_counts}
+            holder = [{"addr": a, "passes": n, "vers": fmt_units(vers[a])}
+                      for a, n in pass_counts.items()]
+            holder.sort(key=lambda r: (-r["passes"], -float(r["vers"]), r["addr"]))
+    if cfg.get("REST_ADDRESS"):
+        cand = sorted(set(pass_counts) | set(uniq_owners) | set(candidates))
+        rest_raw = batch_call([(cfg["REST_ADDRESS"], SEL["balanceOf"] + enc_addr(a)) for a in cand])
+        rest_rows = [{"addr": a, "rest": fmt_units(to_int(h))}
+                     for a, h in zip(cand, rest_raw) if to_int(h) > 0]
+        if rest_rows:
+            rest_rows.sort(key=lambda r: (-float(r["rest"]), r["addr"]))
+            presale = rest_rows
 
     data = {
         "updated": int(time.time()),
@@ -138,10 +195,12 @@ def main():
         "checkers": len(rows),
         "checkin": checkin,
         "referral": referral,
+        "holder": holder,
+        "presale": presale,
     }
     with open(OUT, "w") as f:
         json.dump(data, f, indent=1)
-    print(f"wrote {OUT}: checkers={len(rows)} checkin_top={len(checkin)} referral_top={len(referral)}")
+    print(f"wrote {OUT}: checkers={len(rows)} checkin={len(checkin)} referral={len(referral)} holder={len(holder) if holder else None} presale={len(presale) if presale else None}")
     print("checkin #1:", checkin[0] if checkin else None)
     print("referral #1:", referral[0] if referral else None)
 

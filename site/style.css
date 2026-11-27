@@ -475,3 +475,9 @@ main section { animation: symphonyRise 0.7s ease both; }
 .pbadges .tag { display: block; font-size: 11px; color: var(--gold2); }
 .pbadges figure.locked .tag { color: var(--muted); }
 .lbgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; }
+.lbtabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px; }
+.lbtab { background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; cursor: pointer; font-size: 14px; }
+.lbtab.active { border-color: var(--gold); color: var(--gold2); }
+.lbsoon { background: var(--gold); color: #141414; border-radius: 6px; padding: 1px 6px; font-size: 11px; font-weight: 700; margin-left: 6px; }
+.yourow { border: 1px dashed var(--gold); border-radius: 10px; padding: 10px 14px; margin-top: 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.soonpanel { text-align: center; padding: 26px 10px; color: var(--muted); }
