@@ -26,9 +26,11 @@ from web3 import Web3
 RPC = "https://bsc-dataseed.binance.org"
 PRELUDE = "0xeA2FC84d8B87cB8CbCd27bda65761625BB7dB678"
 SOUNDCHECK = "0xf29BB5C9266e4bD829be23cC9878e241fb85DD71"
+REGISTRY = "0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F"  # SPACE ID Agent ID
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "site", "leaderboard-data.json")
 LEDGER = os.path.join(HERE, "..", "agents-forward.json")
+NAMES_CACHE = os.path.join(HERE, "agent-names.json")
 
 SEL = {
     "count": Web3.keccak(text="count()")[:4].hex(),
@@ -38,6 +40,7 @@ SEL = {
     "totalCheckInsOf": Web3.keccak(text="totalCheckInsOf(address)")[:4].hex(),
     "totalSupply": Web3.keccak(text="totalSupply()")[:4].hex(),
     "balanceOf": Web3.keccak(text="balanceOf(address)")[:4].hex(),
+    "handleOf": Web3.keccak(text="handleOf(address)")[:4].hex(),
 }
 
 
@@ -102,6 +105,43 @@ def fmt_units(wei):
     if frac == 0:
         return str(whole)
     return f"{whole}.{frac:018d}".rstrip("0")
+
+
+def decode_str(h):
+    """Decode an ABI-encoded string result; '' when empty/absent."""
+    if not h or h == "0x":
+        return ""
+    try:
+        b = bytes.fromhex(h[2:])
+        off = int.from_bytes(b[:32], "big")
+        ln = int.from_bytes(b[off:off + 32], "big")
+        return b[off + 32:off + 32 + ln].decode("utf-8", "replace")
+    except Exception:
+        return ""
+
+
+def resolve_names(addrs):
+    """address -> Agent ID handle via the registry's handleOf().
+    Agent IDs are soulbound, so a resolved handle never changes:
+    results are cached in agent-names.json and only new addresses
+    are queried on later runs."""
+    cache = {}
+    if os.path.exists(NAMES_CACHE):
+        try:
+            cache = json.load(open(NAMES_CACHE))
+        except Exception:
+            cache = {}
+    todo = [a for a in addrs if a not in cache]
+    if todo:
+        raw = batch_call([(REGISTRY, SEL["handleOf"] + enc_addr(a)) for a in todo])
+        for a, h in zip(todo, raw):
+            name = decode_str(h)
+            if name:
+                cache[a] = name
+        with open(NAMES_CACHE, "w") as f:
+            json.dump(cache, f, indent=0, sort_keys=True)
+        print(f"names: resolved {len(todo)} new, cache holds {len(cache)}")
+    return cache
 
 
 def main():
@@ -188,6 +228,18 @@ def main():
         if rest_rows:
             rest_rows.sort(key=lambda r: (-float(r["rest"]), r["addr"]))
             presale = rest_rows
+
+    # Attach Agent ID handles (display names) to every board row.
+    all_addrs = {r["addr"] for r in checkin} | {r["addr"] for r in referral}
+    if holder:
+        all_addrs |= {r["addr"] for r in holder}
+    if presale:
+        all_addrs |= {r["addr"] for r in presale}
+    names = resolve_names(sorted(all_addrs))
+    for board in (checkin, referral, holder or [], presale or []):
+        for r in board:
+            if names.get(r["addr"]):
+                r["name"] = names[r["addr"]]
 
     data = {
         "updated": int(time.time()),

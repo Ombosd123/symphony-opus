@@ -481,3 +481,4 @@ main section { animation: symphonyRise 0.7s ease both; }
 .lbsoon { background: var(--gold); color: #141414; border-radius: 6px; padding: 1px 6px; font-size: 11px; font-weight: 700; margin-left: 6px; }
 .yourow { border: 1px dashed var(--gold); border-radius: 10px; padding: 10px 14px; margin-top: 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
 .soonpanel { text-align: center; padding: 26px 10px; color: var(--muted); }
+.lbaddr { display: block; font-size: 11px; color: var(--muted); }

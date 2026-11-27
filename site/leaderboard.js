@@ -78,7 +78,15 @@
         rank.textContent = String(i + 1);
         tr.appendChild(rank);
         const player = document.createElement("td");
-        player.textContent = shortAddr(r.addr);
+        if (r.name) {
+          player.textContent = r.name + ".ai";
+          const sub = document.createElement("span");
+          sub.className = "lbaddr";
+          sub.textContent = shortAddr(r.addr);
+          player.appendChild(sub);
+        } else {
+          player.textContent = shortAddr(r.addr);
+        }
         tr.appendChild(player);
         for (const v of b.cells(r)) {
           const td = document.createElement("td");
@@ -99,6 +107,13 @@
   async function loadYou() {
     if (!account || !window.ethers) return;
     const p = new ethers.JsonRpcProvider(CFG.READ_RPC);
+    try {
+      if (youCache.name === undefined && CFG.AGENT_ID_REGISTRY) {
+        const reg = new ethers.Contract(CFG.AGENT_ID_REGISTRY,
+          ["function handleOf(address) view returns (string)"], p);
+        youCache.name = (await reg.handleOf(account)) || "";
+      }
+    } catch (e) { youCache.name = ""; }
     try {
       if (tab === "soundcheck" && !youCache.soundcheck) {
         const sc = new ethers.Contract(CFG.SOUNDCHECK_ADDRESS, ABI.Soundcheck, p);
@@ -136,7 +151,7 @@
       return;
     }
     if (btn) btn.hidden = true;
-    const me = T("lb_you") + " · " + shortAddr(account);
+    const me = T("lb_you") + " · " + (youCache.name ? youCache.name + ".ai" : shortAddr(account));
     if (isSoon()) { el.textContent = me + " · " + T("lb_soon"); return; }
     if (!data) { el.textContent = me; return; }
     if (tab === "soundcheck") {
