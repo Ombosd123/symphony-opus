@@ -246,6 +246,15 @@ async function refreshMine() {
     }) +
     (magnum ? T("w_magnum_held") : "") +
     (poolShare > 0 ? T("w_poolshare", { amt: poolShare.toFixed(2) }) : ""));
+  // Melody-card check-in notice: a registered holder who has not
+  // checked in yet today (UTC) sees the nudge inside the Your Melody
+  // card — the exact surface every visitor opens for their melody.
+  try {
+    const lastDay = Number(await sc.lastCheckInDayOf(account));
+    const today = Math.floor(Date.now() / 1000 / 86400);
+    const note = $("melCheckinNote");
+    if (note) note.hidden = !(reg && has && !(lastDay === today && total > 0));
+  } catch (e) { /* the notice is a nudge — never block the page */ }
 }
 
 async function doRegister() {
@@ -334,6 +343,7 @@ wire("connectBtn", connect);
 wire("registerBtn", doRegister);
 wire("copyRefBtn", copyRefLink);
 wire("checkInBtn", doCheckIn);
+wire("melCheckinBtn", doCheckIn);
 wire("repairBtn", doRepair);
 
 // ---------- contact form (Web3Forms + Turnstile) ----------
