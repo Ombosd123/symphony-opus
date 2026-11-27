@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Profile — SYMPHONY ($OPUS)</title>
+<meta name="description" content="SYMPHONY ($OPUS) — your Prelude Pass, Soundcheck streak, badges and sale holdings, read directly from the contracts.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="My Profile — SYMPHONY ($OPUS)">
+<meta property="og:description" content="Your Prelude Pass, Soundcheck streak, badges and sale holdings — read directly from the contracts.">
+<meta property="og:image" content="https://symphony-opus.pages.dev/assets/intro-poster.webp">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">SYMPHONY</a>
+  <nav>
+    <a href="index.html#prelude" data-i18n="nav_prelude">Prelude</a>
+    <a href="index.html#soundcheck" data-i18n="nav_soundcheck">Soundcheck</a>
+    <a href="index.html#presale" data-i18n="nav_presale">Presale</a>
+    <a href="index.html#sale" data-i18n="nav_sale">Sale</a>
+    <a href="index.html#market" data-i18n="nav_market">Market</a>
+    <a href="profile.html" data-i18n="nav_profile">My Profile</a>
+    <a href="roadmap.html" data-i18n="nav_roadmap">Roadmap</a>
+    <a href="scherzo.html" data-i18n="nav_scherzo">Scherzo</a>
+    <a href="faq.html" data-i18n="nav_faq">FAQ</a>
+    <a href="index.html#contact" data-i18n="nav_contact">Contact</a>
+  </nav>
+  <div class="spacer"></div>
+  <select id="langSelect" aria-label="Language">
+    <option value="en">English</option>
+    <option value="zh-Hans">简体中文</option>
+    <option value="ja">日本語</option>
+    <option value="id">Bahasa Indonesia</option>
+    <option value="vi">Tiếng Việt</option>
+  </select>
+  <button id="soundToggleBtn" type="button" class="ghost">🔊 Sound on</button>
+  <button id="profConnectBtn" data-i18n="btn_connect">Connect wallet</button>
+</header>
+<main>
+  <section>
+    <h2 data-i18n="prof_title">My Profile</h2>
+    <p class="muted" data-i18n="prof_intro">Everything your wallet holds in SYMPHONY — read directly from the contracts.</p>
+    <p class="status" id="profNote"></p>
+    <p id="profAddrRow" hidden><span data-i18n="prof_addr">Wallet</span>: <strong id="profAddr"></strong></p>
+
+    <div class="profgrid" id="profGrid" hidden>
+      <div class="profcard">
+        <h3 data-i18n="prof_prelude">Prelude</h3>
+        <p id="profPreludeLine">—</p>
+        <p class="small muted" id="profRefLine"></p>
+      </div>
+      <div class="profcard">
+        <h3 data-i18n="prof_sc">Soundcheck</h3>
+        <div class="profrows">
+          <div class="row"><span data-i18n="prof_total">Total check-in days</span><strong id="profTotal">—</strong></div>
+          <div class="row"><span data-i18n="prof_streak">Current streak (days)</span><strong id="profStreak">—</strong></div>
+          <div class="row"><span data-i18n="prof_today">Today (UTC)</span><strong id="profToday">—</strong></div>
+        </div>
+        <p class="small muted" id="profNext"></p>
+      </div>
+      <div class="profcard">
+        <h3 data-i18n="prof_sale">Sale &amp; holdings</h3>
+        <p class="small muted" id="profSaleSoon" data-i18n="prof_sale_soon">The sale opens 12 Dec 2026, 12:00 UTC. Your Symphony Passes, VERS, presale contribution and REST will appear here.</p>
+        <div class="profrows" id="profSaleRows" hidden>
+          <div class="row" id="rowPassHeld" hidden><span data-i18n="prof_pass_held">Symphony Passes held</span><strong id="profPassHeld">—</strong></div>
+          <div class="row" id="rowPrimary" hidden><span data-i18n="prof_primary">Bought in the primary sale</span><strong id="profPrimary">—</strong></div>
+          <div class="row" id="rowVers" hidden><span data-i18n="prof_vers">VERS balance</span><strong id="profVers">—</strong></div>
+          <div class="row" id="rowRest" hidden><span data-i18n="prof_rest">REST balance (presale receipt)</span><strong id="profRest">—</strong></div>
+          <div class="row" id="rowPreContrib" hidden><span data-i18n="prof_pre_contrib">Presale contribution (USDT)</span><strong id="profPreContrib">—</strong></div>
+          <div class="row" id="rowPreOwed" hidden><span data-i18n="prof_pre_owed">Presale OPUS owed</span><strong id="profPreOwed">—</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="profBadgesWrap" hidden>
+      <h3 data-i18n="prof_badges">Badges</h3>
+      <div class="pbadges" id="profBadges"></div>
+    </div>
+  </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<script src="config.js"></script>
+<script src="abi.js"></script>
+<script src="i18n.js"></script>
+<script src="melody.js"></script>
+<script src="profile.js"></script>
+</body>
+</html>

@@ -13,7 +13,7 @@ window.SYMPHONY_CONFIG = {
   SOUNDCHECK_ADDRESS: "0xf29BB5C9266e4bD829be23cC9878e241fb85DD71", // Soundcheck
   VAULT_ADDRESS: "0x4d32E4a76C7389445F9CB76f7098E4D50E0503A7", // TreasuryVault
 
-  // --- Phase 2 (deploy 8–10 Dec 2026) — FILL AFTER DEPLOY ---
+  // --- Phase 2 (deploy 7 Dec 2026) — FILL AFTER DEPLOY ---
   // While any of these is empty the market section stays in its
   // closed state, exactly as published today. The market UI also
   // opens only when the market contract itself reports open
@@ -23,6 +23,9 @@ window.SYMPHONY_CONFIG = {
   PASS_ADDRESS: "", // SymphonyPass
   MARKET_ADDRESS: "", // SymphonyMarket
   MARKET_DEPLOY_BLOCK: 0, // SymphonyMarket deployment block — the Listed-event scan starts here
+  VERS_ADDRESS: "", // VersToken
+  REST_ADDRESS: "", // RestToken
+  PRESALE_ADDRESS: "", // OpusPresale
 
   // --- Fixed network / ecosystem values ---
   AGENT_ID_REGISTRY: "0x60B9262456dE011F7d15a54CdD8c48bAaa8B022F",

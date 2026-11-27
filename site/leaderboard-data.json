@@ -1,0 +1,91 @@
+{
+ "updated": 1795779215,
+ "registrants": 379,
+ "checkers": 167,
+ "checkin": [
+  {
+   "addr": "0x0a90f878e4cf3ef3bc0ee4a67e2ff0166986ad5f",
+   "streak": 6,
+   "total": 6
+  },
+  {
+   "addr": "0x24d6027a92c7a5f79e470aad74f3494e71ebb7da",
+   "streak": 6,
+   "total": 6
+  },
+  {
+   "addr": "0x5c5d73a6090c5b815c137d3f862822f36713aa1c",
+   "streak": 6,
+   "total": 6
+  },
+  {
+   "addr": "0x9cb87807c0eb07ae2f2376e8bb4a2d92cdb366b9",
+   "streak": 6,
+   "total": 6
+  },
+  {
+   "addr": "0xccfaa6a7dbc37957c262bbf262765d2283d1c3b3",
+   "streak": 6,
+   "total": 6
+  },
+  {
+   "addr": "0xd301d472f2e469a1aafa1af6f214e312f1858873",
+   "streak": 6,
+   "total": 6
+  },
+  {
+   "addr": "0x31ac435a214ca1731fcc1cadc496288e5a35d1f3",
+   "streak": 5,
+   "total": 5
+  },
+  {
+   "addr": "0x4bf3b87cbffd2cbf8dbaa2190e6b4302e45c339e",
+   "streak": 5,
+   "total": 5
+  },
+  {
+   "addr": "0x4d50dd3e57d1f4adade559bd075bca0496aaa29b",
+   "streak": 5,
+   "total": 5
+  },
+  {
+   "addr": "0x80016477633efec97bcb9eb535ede807430bc043",
+   "streak": 5,
+   "total": 5
+  }
+ ],
+ "referral": [
+  {
+   "addr": "0x8fdf2b773670a3807f6bb440ccce7753a906a86e",
+   "refs": 9
+  },
+  {
+   "addr": "0x3cc7a2268cc4ab868b7ff4690cf75e2457eaa8b0",
+   "refs": 4
+  },
+  {
+   "addr": "0xf392f2504dbbb595423128d3286791528bd55c10",
+   "refs": 4
+  },
+  {
+   "addr": "0xf69ef2dfc09218b3eaddef5c8cfd9cdcc693dadc",
+   "refs": 2
+  },
+  {
+   "addr": "0x4deda1657ce8d6cef9faf28f54c635e2fe83214c",
+   "refs": 2
+  },
+  {
+   "addr": "0x31ac435a214ca1731fcc1cadc496288e5a35d1f3",
+   "refs": 1
+  },
+  {
+   "addr": "0xabfd7912d89275817459ab75a229eda7ccd561f4",
+   "refs": 1
+  },
+  {
+   "addr": "0x16df9742cef1f7c7412c2238edfc3836a653f6fe",
+   "refs": 1
+  }
+ ]
+}

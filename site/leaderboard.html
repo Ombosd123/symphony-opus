@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leaderboard — SYMPHONY ($OPUS)</title>
+<meta name="description" content="SYMPHONY ($OPUS) leaderboards — top Soundcheck streaks and top Prelude referrers, read from the contracts.">
+<link rel="icon" type="image/png" href="assets/logo.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Leaderboard — SYMPHONY ($OPUS)">
+<meta property="og:description" content="Top Soundcheck streaks and top Prelude referrers — read from the contracts.">
+<meta property="og:image" content="https://symphony-opus.pages.dev/assets/intro-poster.webp">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html">SYMPHONY</a>
+  <nav>
+    <a href="index.html#prelude" data-i18n="nav_prelude">Prelude</a>
+    <a href="index.html#soundcheck" data-i18n="nav_soundcheck">Soundcheck</a>
+    <a href="index.html#presale" data-i18n="nav_presale">Presale</a>
+    <a href="index.html#sale" data-i18n="nav_sale">Sale</a>
+    <a href="index.html#market" data-i18n="nav_market">Market</a>
+    <a href="profile.html" data-i18n="nav_profile">My Profile</a>
+    <a href="leaderboard.html" data-i18n="nav_leaderboard">Leaderboard</a>
+    <a href="roadmap.html" data-i18n="nav_roadmap">Roadmap</a>
+    <a href="scherzo.html" data-i18n="nav_scherzo">Scherzo</a>
+    <a href="faq.html" data-i18n="nav_faq">FAQ</a>
+    <a href="index.html#contact" data-i18n="nav_contact">Contact</a>
+  </nav>
+  <div class="spacer"></div>
+  <select id="langSelect" aria-label="Language">
+    <option value="en">English</option>
+    <option value="zh-Hans">简体中文</option>
+    <option value="ja">日本語</option>
+    <option value="id">Bahasa Indonesia</option>
+    <option value="vi">Tiếng Việt</option>
+  </select>
+  <button id="soundToggleBtn" type="button" class="ghost">🔊 Sound on</button>
+</header>
+<main>
+  <section>
+    <h2 data-i18n="lb_title">Leaderboard</h2>
+    <p class="muted" data-i18n="lb_intro">Two boards, read from the contracts: who shows up every day, and who brings the orchestra together.</p>
+    <div class="lbgrid">
+      <div>
+        <h3 data-i18n="lb_checkin_title">Soundcheck — top streaks</h3>
+        <table>
+          <thead><tr>
+            <th data-i18n="lb_col_rank">#</th>
+            <th data-i18n="lb_col_player">Player</th>
+            <th data-i18n="lb_col_streak">Streak</th>
+            <th data-i18n="lb_col_total">Check-in days</th>
+          </tr></thead>
+          <tbody id="lbCheckinBody"></tbody>
+        </table>
+        <p class="small muted" id="lbCheckinEmpty" data-i18n="lb_empty" hidden>No entries yet.</p>
+      </div>
+      <div>
+        <h3 data-i18n="lb_ref_title">Prelude — top referrers</h3>
+        <table>
+          <thead><tr>
+            <th data-i18n="lb_col_rank">#</th>
+            <th data-i18n="lb_col_player">Player</th>
+            <th data-i18n="lb_col_refs">Referrals</th>
+          </tr></thead>
+          <tbody id="lbRefBody"></tbody>
+        </table>
+        <p class="small muted" id="lbRefEmpty" data-i18n="lb_empty" hidden>No entries yet.</p>
+      </div>
+    </div>
+    <p class="small muted"><span data-i18n="lb_updated">Updated</span>: <span id="lbUpdated">—</span></p>
+    <p class="small muted" data-i18n="lb_note">Addresses are shortened; the full records are on-chain. The boards refresh periodically.</p>
+  </section>
+</main>
+<script src="config.js"></script>
+<script src="i18n.js"></script>
+<script src="melody.js"></script>
+<script src="leaderboard.js"></script>
+</body>
+</html>

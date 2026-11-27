@@ -459,3 +459,19 @@ main section { animation: symphonyRise 0.7s ease both; }
   border-radius: 10px; cursor: pointer;
 }
 .mk-sell-note { margin-top: 10px; line-height: 1.6; }
+
+/* My Profile + Leaderboard (added 2026-11-27) */
+.profgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+.profcard { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+.profcard h3 { margin-top: 0; }
+.profrows { display: grid; gap: 6px; }
+.profrows .row { display: flex; justify-content: space-between; gap: 12px; }
+.pbadges { display: flex; flex-wrap: wrap; gap: 14px; }
+.pbadges figure { margin: 0; width: 104px; text-align: center; }
+.pbadges img { width: 104px; height: 104px; object-fit: cover; border-radius: 50%; border: 2px solid var(--line); }
+.pbadges figure.earned img { border-color: var(--gold); }
+.pbadges figure.locked img { filter: grayscale(1); opacity: 0.45; }
+.pbadges figcaption { font-size: 12px; color: var(--muted); margin-top: 5px; }
+.pbadges .tag { display: block; font-size: 11px; color: var(--gold2); }
+.pbadges figure.locked .tag { color: var(--muted); }
+.lbgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; }
