@@ -79,6 +79,22 @@ async function renderScoreChart(n) {
     if (!res.ok) { wrap.hidden = true; return; }
     const data = await res.json();
     const days = (data.days || []).filter((d) => d.cum >= CFG.PRELUDE_GATE + 1 && d.joins > 0);
+    // Live reconciliation: the header count is a live chain read while
+    // this file refreshes every 4 hours — patch the current day from
+    // the live count so the chart never disagrees with the number
+    // printed above it. Only a same-day patch or a single missing day
+    // boundary is applied; anything older is left for the updater to
+    // rebuild exactly from the event history.
+    if (days.length && n > days[days.length - 1].cum) {
+      const last = days[days.length - 1];
+      const today = new Date().toISOString().slice(0, 10);
+      if (last.d === today) {
+        last.joins += n - last.cum;
+        last.cum = n;
+      } else if (Math.round((Date.parse(today) - Date.parse(last.d)) / 86400000) === 1) {
+        days.push({ d: today, joins: n - last.cum, cum: n });
+      }
+    }
     if (!days.length) { wrap.hidden = true; return; }
     const max = Math.max(...days.map((d) => d.joins), 1);
     const staff = $("scoreStaff");
